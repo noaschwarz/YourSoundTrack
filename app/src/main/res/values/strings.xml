@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">YourSoundTrack</string>
+    <string name="soundtrack_you">SoundTrack You</string>
+    <string name="profile">Profile</string>
+    <string name="lists">Lists</string>
+    <string name="default_username">User Name</string>
+    <string name="top_5_albums">Top 5 Albums</string>
+    <string name="last_listens">Last Listens</string>
+    <string name="fav_artists">Fav Artists</string>
+    <string name="list_filter_all">All</string>
+    <string name="list_filter_logged">Logged</string>
+    <string name="list_filter_plan">Plan</string>
+    <string name="list_filter_my_lists">My Lists</string>
+    <string name="desc_user_avatar">User profile picture avatar</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="new_listen">New</string>
+    <string name="community">Community</string>
+    <string name="you">You</string>
+    <string name="title_yoursoundtrack">YourSoundTrack</string>
+    <string name="btn_login">Log In</string>
+    <string name="btn_new_user">New User</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="title_create_account">Create Account</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_more_info">More Info</string>
+    <string name="btn_create">Create</string>
+    <string name="title_soundtrack_new">SoundTrack New</string>
+    <string name="subtitle_track_new_music">Track new music</string>
+    <string name="selector_new_album">new album  &gt;</string>
+    <string name="selector_new_track">new track  &gt;</string>
+    <string name="default_item_name">Name</string>
+    <string name="hint_review">Review…</string>
+    <string name="symbol_heart">♥</string>
+    <string name="btn_save">Save</string>
+    <string name="title_soundtrack">SoundTrack</string>
+    <string name="header_upcoming_releases">Upcoming Releases</string>
+    <string name="header_popular_this_week">Popular This Week</string>
+    <string name="header_popular_with_friends">Popular With Friends</string>
+
+    <string name="title_soundtrack_search">SoundTrack Search</string>
+    <string name="label_browse_by">Browse by</string>
+    <string name="btn_browse_release_date">Release Date  &gt;</string>
+    <string name="btn_browse_genre">Genre  &gt;</string>
+    <string name="btn_browse_most_popular">Most Popular  &gt;</string>
+    <string name="btn_browse_highest_rated">Highest Rated  &gt;</string>
+
+    <string name="title_soundtrack_community">SoundTrack Community</string>
+    <string name="header_friends_listens">Friends Last Listens</string>
+    <string name="header_friends_reviews">Friends Last Reviews</string>
+    <string name="btn_popular_new_reviews">Popular New Reviews  &gt;</string>
+    <string name="btn_popular_community_lists">Popular Community Lists  &gt;</string>
+</resources>

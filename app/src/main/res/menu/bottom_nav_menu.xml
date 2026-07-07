@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:title="@string/home"
+        android:icon="@android:drawable/ic_menu_compass" />
+
+    <item
+        android:id="@+id/navigation_search"
+        android:title="@string/search"
+        android:icon="@android:drawable/ic_menu_search" />
+
+    <item
+        android:id="@+id/navigation_new"
+        android:title="@string/new_listen"
+        android:icon="@android:drawable/ic_menu_add" />
+
+    <item
+        android:id="@+id/navigation_community"
+        android:title="@string/community"
+        android:icon="@android:drawable/ic_menu_share" />
+
+    <item
+        android:id="@+id/navigation_you"
+        android:title="@string/you"
+        android:icon="@android:drawable/ic_menu_myplaces" />
+
+</menu>

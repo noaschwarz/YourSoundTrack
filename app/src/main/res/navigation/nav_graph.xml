@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_auth">
+
+    <!-- Gateway / Login Screen -->
+    <fragment
+        android:id="@+id/navigation_auth"
+        android:name="com.example.yoursoundtrack.ui.auth.AuthFragment"
+        android:label="Authentication"
+        tools:layout="@layout/fragment_auth" />
+
+    <!-- Main Dashboard Screen -->
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.yoursoundtrack.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <!-- Search Screen -->
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.example.yoursoundtrack.ui.search.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
+
+    <!-- New Log Screen -->
+    <fragment
+        android:id="@+id/navigation_new"
+        android:name="com.example.yoursoundtrack.ui.entry.NewListenFragment"
+        android:label="New Listen"
+        tools:layout="@layout/fragment_new_listen" />
+
+    <!-- Community Screen -->
+    <fragment
+        android:id="@+id/navigation_community"
+        android:name="com.example.yoursoundtrack.ui.community.CommunityFragment"
+        android:label="Community"
+        tools:layout="@layout/fragment_community" />
+
+    <!-- Profile & Lists Screen -->
+    <fragment
+        android:id="@+id/navigation_you"
+        android:name="com.example.yoursoundtrack.ui.user.UserFragment"
+        android:label="You"
+        tools:layout="@layout/fragment_user" />
+
+</navigation>
