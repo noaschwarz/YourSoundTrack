@@ -1,6 +1,57 @@
 <resources>
+    <!-- Global / System App Strings -->
     <string name="app_name">YourSoundTrack</string>
-    <string name="soundtrack_you">SoundTrack You</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="new_listen">New</string>
+    <string name="community">Community</string>
+    <string name="you">You</string>
+
+    <!-- Authentication Screen -->
+    <string name="title_yoursoundtrack">YourSoundTrack</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_new_user">New User</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="title_create_account">Create A New Account</string>
+    <string name="btn_create">Create</string>
+
+    <!-- Home Screen -->
+    <string name="title_soundtrack">YourSoundTrackHome</string>
+    <string name="header_upcoming_releases">Upcoming Releases</string>
+    <string name="header_popular_this_week">Popular This Week</string>
+    <string name="header_popular_with_friends">Popular With Friends</string>
+
+    <!-- Search Screen -->
+    <string name="title_soundtrack_search">SearchYourSoundTrack</string>
+    <string name="label_browse_by">Browse by</string>
+    <string name="btn_browse_release_date">Release Date  &gt;</string>
+    <string name="btn_browse_genre">Genre  &gt;</string>
+    <string name="btn_browse_most_popular">Most Popular  &gt;</string>
+    <string name="btn_browse_highest_rated">Highest Rated  &gt;</string>
+
+    <!-- New Listen Screen -->
+    <string name="title_soundtrack_new">AddYourSoundTrack</string>
+    <string name="subtitle_track_new_music">Add a new listen</string>
+    <string name="hint_search_album">Search album name…</string>
+    <string name="label_date_added">Date Added:</string>
+    <string name="desc_album_art_preview">Selected album art preview</string>
+    <string name="default_item_name">Name</string>
+    <string name="hint_review">Review…</string>
+    <string name="btn_save">Save</string>
+
+    <!-- Community Screen -->
+    <string name="title_soundtrack_community">OurSoundTrack</string>
+    <string name="header_friends_listens">Friends Last Listens</string>
+    <string name="header_friends_reviews">Friends Last Reviews</string>
+    <string name="btn_popular_new_reviews">Popular New Reviews  &gt;</string>
+    <string name="btn_popular_community_lists">Popular Community Lists  &gt;</string>
+
+    <!-- User / Profile Screen ("You") -->
+    <string name="soundtrack_you">YOURSoundTrack</string>
     <string name="profile">Profile</string>
     <string name="lists">Lists</string>
     <string name="default_username">User Name</string>
@@ -12,43 +63,4 @@
     <string name="list_filter_plan">Plan</string>
     <string name="list_filter_my_lists">My Lists</string>
     <string name="desc_user_avatar">User profile picture avatar</string>
-    <string name="home">Home</string>
-    <string name="search">Search</string>
-    <string name="new_listen">New</string>
-    <string name="community">Community</string>
-    <string name="you">You</string>
-    <string name="title_yoursoundtrack">YourSoundTrack</string>
-    <string name="btn_login">Log In</string>
-    <string name="btn_new_user">New User</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_password">Password</string>
-    <string name="title_create_account">Create Account</string>
-    <string name="hint_name">Name</string>
-    <string name="hint_more_info">More Info</string>
-    <string name="btn_create">Create</string>
-    <string name="title_soundtrack_new">SoundTrack New</string>
-    <string name="subtitle_track_new_music">Track new music</string>
-    <string name="selector_new_album">new album  &gt;</string>
-    <string name="selector_new_track">new track  &gt;</string>
-    <string name="default_item_name">Name</string>
-    <string name="hint_review">Review…</string>
-    <string name="symbol_heart">♥</string>
-    <string name="btn_save">Save</string>
-    <string name="title_soundtrack">SoundTrack</string>
-    <string name="header_upcoming_releases">Upcoming Releases</string>
-    <string name="header_popular_this_week">Popular This Week</string>
-    <string name="header_popular_with_friends">Popular With Friends</string>
-
-    <string name="title_soundtrack_search">SoundTrack Search</string>
-    <string name="label_browse_by">Browse by</string>
-    <string name="btn_browse_release_date">Release Date  &gt;</string>
-    <string name="btn_browse_genre">Genre  &gt;</string>
-    <string name="btn_browse_most_popular">Most Popular  &gt;</string>
-    <string name="btn_browse_highest_rated">Highest Rated  &gt;</string>
-
-    <string name="title_soundtrack_community">SoundTrack Community</string>
-    <string name="header_friends_listens">Friends Last Listens</string>
-    <string name="header_friends_reviews">Friends Last Reviews</string>
-    <string name="btn_popular_new_reviews">Popular New Reviews  &gt;</string>
-    <string name="btn_popular_community_lists">Popular Community Lists  &gt;</string>
 </resources>

@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
+        android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/card_login_popup">
 
@@ -20,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_yoursoundtrack"
-            android:textSize="32sp"
+            android:textSize="@dimen/title_size"
             android:textStyle="bold"
             android:layout_marginBottom="48dp" />
 
@@ -29,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/btn_login"
+            android:textSize="@dimen/button_text_size"
             android:layout_marginBottom="16dp" />
 
         <Button
@@ -36,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="@string/btn_new_user" />
+            android:text="@string/btn_new_user"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -85,7 +88,8 @@
                 android:id="@+id/btn_submit_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_login" />
+                android:text="@string/btn_login"
+                android:textSize="@dimen/button_text_size"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -132,20 +136,12 @@
             android:autofillHints="password"
             android:layout_marginBottom="12dp" />
 
-        <EditText
-            android:id="@+id/et_register_more"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_more_info"
-            android:inputType="textLongMessage"
-            android:autofillHints="none"
-            android:layout_marginBottom="24dp" />
-
         <Button
             android:id="@+id/btn_submit_register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/btn_create" />
+            android:text="@string/btn_create"
+            android:textSize="@dimen/button_text_size"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
