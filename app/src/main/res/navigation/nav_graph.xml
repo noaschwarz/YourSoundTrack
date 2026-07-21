@@ -3,47 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/navigation_auth">
+    app:startDestination="@id/navigation_home">
 
     <!-- Gateway / Login Screen -->
     <fragment
         android:id="@+id/navigation_auth"
-        android:name="com.example.yoursoundtrack.ui.auth.AuthFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.AuthFragment"
         android:label="Authentication"
         tools:layout="@layout/fragment_auth" />
 
     <!-- Main Dashboard Screen -->
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.yoursoundtrack.ui.home.HomeFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
     <!-- Search Screen -->
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.example.yoursoundtrack.ui.search.SearchFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.SearchFragment"
         android:label="Search"
         tools:layout="@layout/fragment_search" />
+
+    <!-- Album Details Screen -->
+    <fragment
+        android:id="@+id/navigation_album_detail"
+        android:name="com.example.yoursoundtrack.ui.theme.AlbumDetailFragment"
+        android:label="Album Details"
+        tools:layout="@layout/fragment_album_detail" />
 
     <!-- New Log Screen -->
     <fragment
         android:id="@+id/navigation_new"
-        android:name="com.example.yoursoundtrack.ui.entry.NewListenFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.NewListenFragment"
         android:label="New Listen"
         tools:layout="@layout/fragment_new_listen" />
 
     <!-- Community Screen -->
     <fragment
         android:id="@+id/navigation_community"
-        android:name="com.example.yoursoundtrack.ui.community.CommunityFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.CommunityFragment"
         android:label="Community"
         tools:layout="@layout/fragment_community" />
 
     <!-- Profile & Lists Screen -->
     <fragment
         android:id="@+id/navigation_you"
-        android:name="com.example.yoursoundtrack.ui.user.UserFragment"
+        android:name="com.example.yoursoundtrack.ui.theme.UserFragment"
         android:label="You"
         tools:layout="@layout/fragment_user" />
 

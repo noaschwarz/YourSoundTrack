@@ -1,47 +1,45 @@
 package com.example.yoursoundtrack
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.yoursoundtrack.ui.theme.YourSoundTrackTheme
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.example.yoursoundtrack.managers.FirebaseAuthManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            YourSoundTrackTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        setContentView(R.layout.activity_main)
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+
+        navHostFragment?.let { host ->
+            val navController = host.navController
+            bottomNavigationView?.setupWithNavController(navController)
+
+            // 1. Check Auth without re-inflating the graph on the main thread
+            if (FirebaseAuthManager.isUserLoggedIn()) {
+                // If user is already logged in and current screen is Auth, skip straight to Home
+                if (navController.currentDestination?.id == R.id.navigation_auth) {
+                    navController.navigate(R.id.navigation_home)
+                }
+            }
+
+            // 2. Control BottomNavigationView visibility based on destination
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.navigation_auth -> {
+                        bottomNavigationView?.visibility = View.GONE
+                    }
+                    else -> {
+                        bottomNavigationView?.visibility = View.VISIBLE
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    YourSoundTrackTheme {
-        Greeting("Android")
     }
 }
