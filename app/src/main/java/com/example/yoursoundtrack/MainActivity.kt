@@ -19,17 +19,24 @@ class MainActivity : AppCompatActivity() {
 
         navHostFragment?.let { host ->
             val navController = host.navController
-            bottomNavigationView?.setupWithNavController(navController)
 
-            // 1. Check Auth without re-inflating the graph on the main thread
+            // Inflate navigation graph programmatically
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+
+            // Determine initial destination based on auth status
             if (FirebaseAuthManager.isUserLoggedIn()) {
-                // If user is already logged in and current screen is Auth, skip straight to Home
-                if (navController.currentDestination?.id == R.id.navigation_auth) {
-                    navController.navigate(R.id.navigation_home)
-                }
+                navGraph.setStartDestination(R.id.navigation_home)
+            } else {
+                navGraph.setStartDestination(R.id.navigation_auth)
             }
 
-            // 2. Control BottomNavigationView visibility based on destination
+            // Set the graph dynamically
+            navController.graph = navGraph
+
+            // Connect BottomNavigationView to NavController
+            bottomNavigationView?.setupWithNavController(navController)
+
+            // Dynamic bottom nav visibility
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.navigation_auth -> {
