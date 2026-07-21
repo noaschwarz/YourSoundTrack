@@ -31,7 +31,12 @@
         android:id="@+id/navigation_album_detail"
         android:name="com.example.yoursoundtrack.ui.theme.AlbumDetailFragment"
         android:label="Album Details"
-        tools:layout="@layout/fragment_album_detail" />
+        tools:layout="@layout/fragment_album_detail">
+
+        <argument
+            android:name="albumId"
+            app:argType="string" />
+    </fragment>
 
     <!-- New Log Screen -->
     <fragment

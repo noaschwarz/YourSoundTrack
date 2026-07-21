@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "592698443279",
+    "project_id": "your-sound-track-app-123",
+    "storage_bucket": "your-sound-track-app-123.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592698443279:android:ee2774c7c4f1896da5457a",
+        "android_client_info": {
+          "package_name": "com.example.yoursoundtrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr0NopA3DfDmqzVchDh3GNlRfgIVPmPyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
