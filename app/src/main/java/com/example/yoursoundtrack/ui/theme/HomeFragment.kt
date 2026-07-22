@@ -1,100 +1,78 @@
 package com.example.yoursoundtrack.ui.theme
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.yoursoundtrack.R
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import org.json.JSONObject
+import com.example.yoursoundtrack.adapters.AlbumAdapter
+import com.example.yoursoundtrack.dataModel.Album
+import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
+    private val viewModel: MusicViewModel by viewModels()
+
+    private lateinit var upcomingAdapter: AlbumAdapter
+    private lateinit var popularAdapter: AlbumAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-         //Thread { seedAlbumsToFirestore(requireContext()) }.start() //meant for adding albums to DB
-
-        // Check if current user is logged in and exists in DB
-        checkCurrentUserInDb()
+        setupRecyclerViews(view)
+        observeViewModel()
     }
 
-    fun checkCurrentUserInDb() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid != null) {
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        Log.d("FirestoreCheck", "User Data: ${document.data}")
-                    } else {
-                        Log.d("FirestoreCheck", "No such document found!")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("FirestoreCheck", "Error fetching user", exception)
-                }
+    private fun setupRecyclerViews(view: View) {
+        val onAlbumClick: (Album) -> Unit = { album ->
+            val bundle = Bundle().apply {
+                putString("albumId", album.id)
+            }
+            findNavController().navigate(R.id.navigation_album_detail, bundle)
+        }
+
+        upcomingAdapter = AlbumAdapter(onAlbumClick)
+        popularAdapter = AlbumAdapter(onAlbumClick)
+
+        // Switch to Grid (3 columns) and disable nested scrolling inside ScrollView
+        view.findViewById<RecyclerView>(R.id.rv_upcoming_releases)?.apply {
+            layoutManager = GridLayoutManager(context, 3)
+            isNestedScrollingEnabled = false
+            adapter = upcomingAdapter
+        }
+
+        view.findViewById<RecyclerView>(R.id.rv_popular_this_week)?.apply {
+            layoutManager = GridLayoutManager(context, 3)
+            isNestedScrollingEnabled = false
+            adapter = popularAdapter
         }
     }
 
-    fun seedAlbumsToFirestore(context: Context) {
-        try {
-            val jsonString = context.assets.open("albums_100.json").bufferedReader().use { it.readText() }
-            val jsonObject = JSONObject(jsonString)
-            val albumsArray = jsonObject.getJSONArray("albums")
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-            val db = FirebaseFirestore.getInstance()
-            val batch = db.batch()
-
-            for (i in 0 until albumsArray.length()) {
-                val albumObj = albumsArray.getJSONObject(i)
-                val id = albumObj.getString("id")
-
-                val tracksArray = albumObj.getJSONArray("tracks")
-                val tracksList = mutableListOf<String>()
-                for (j in 0 until tracksArray.length()) {
-                    tracksList.add(tracksArray.getString(j))
+                // Observe 2026 Upcoming Releases
+                launch {
+                    viewModel.upcomingReleasesState.collect { upcomingAlbums ->
+                        upcomingAdapter.submitList(upcomingAlbums)
+                    }
                 }
 
-                val albumMap = hashMapOf(
-                    "id" to id,
-                    "title" to albumObj.getString("title"),
-                    "artist" to albumObj.getString("artist"),
-                    "releaseYear" to albumObj.getInt("releaseYear"),
-                    "genre" to albumObj.getString("genre"),
-                    "coverUrl" to albumObj.getString("coverUrl"),
-                    "avgRating" to albumObj.getDouble("avgRating"),
-                    "tracks" to tracksList
-                )
+                // Observe Popular This Week
+                launch {
+                    viewModel.popularThisWeekState.collect { popularAlbums ->
+                        popularAdapter.submitList(popularAlbums)
+                    }
+                }
 
-                val docRef = db.collection("albums").document(id)
-                batch.set(docRef, albumMap)
             }
-
-            batch.commit()
-                .addOnSuccessListener {
-                    Log.d("FirestoreSeed", "Successfully uploaded ${albumsArray.length()} albums!")
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FirestoreSeed", "Error committing batch", e)
-                }
-
-        } catch (e: Exception) {
-            Log.e("FirestoreSeed", "Error parsing JSON or reading asset", e)
         }
     }
 }
