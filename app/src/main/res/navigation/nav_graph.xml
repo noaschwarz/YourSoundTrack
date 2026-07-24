@@ -5,7 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/navigation_auth">
 
-    <!-- Gateway / Login Screen -->
+    <!-- Login Screen -->
     <fragment
         android:id="@+id/navigation_auth"
         android:name="com.example.yoursoundtrack.ui.theme.AuthFragment"
@@ -29,7 +29,12 @@
         android:id="@+id/navigation_search"
         android:name="com.example.yoursoundtrack.ui.theme.SearchFragment"
         android:label="Search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_album_detail"
+            app:destination="@id/navigation_album_detail" />
+    </fragment>
 
     <!-- Album Details Screen -->
     <fragment

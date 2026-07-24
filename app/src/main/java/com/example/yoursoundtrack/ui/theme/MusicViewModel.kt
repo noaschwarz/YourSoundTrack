@@ -6,14 +6,14 @@ import com.example.yoursoundtrack.dataModel.Album
 import com.example.yoursoundtrack.managers.MusicRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class MusicViewModel(
-    private val repository: MusicRepository = MusicRepository()
-) : ViewModel() {
+class MusicViewModel : ViewModel() {
 
-    // Base flow of all albums from repository
+    private val repository = MusicRepository()
+
     val allAlbumsState: StateFlow<List<Album>> = repository.getAlbumsFlow()
         .stateIn(
             scope = viewModelScope,
@@ -21,10 +21,10 @@ class MusicViewModel(
             initialValue = emptyList()
         )
 
-    // Filtered flow: 2026 releases only (top 6)
-    val upcomingReleasesState: StateFlow<List<Album>> = repository.getAlbumsFlow()
+    // releases/ed in calander year
+    val upcomingReleasesState: StateFlow<List<Album>> = allAlbumsState
         .map { albums ->
-            albums.filter { it.releaseYear == 2026 }.take(6)
+            albums.sortedByDescending { it.releaseYear }.take(6)
         }
         .stateIn(
             scope = viewModelScope,
@@ -32,8 +32,8 @@ class MusicViewModel(
             initialValue = emptyList()
         )
 
-    // Sorted flow: Popular this week sorted by avgRating (top 6)
-    val popularThisWeekState: StateFlow<List<Album>> = repository.getAlbumsFlow()
+    // top 6 sorted by rating
+    val popularThisWeekState: StateFlow<List<Album>> = allAlbumsState
         .map { albums ->
             albums.sortedByDescending { it.avgRating }.take(6)
         }
@@ -42,4 +42,36 @@ class MusicViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    // see if in WTL
+    val wantToListenIdsState: StateFlow<List<String>> = repository.getWantToListenAlbumIdsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    // albums objects in WTL
+    val wantToListenAlbumsState: StateFlow<List<Album>> = combine(
+        allAlbumsState,
+        wantToListenIdsState
+    ) { albums, savedIds ->
+        albums.filter { savedIds.contains(it.id) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    // user rating
+    val userRatingsState: StateFlow<Map<String, Float>> = repository.getUserRatingsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
+
+    fun toggleWantToListen(albumId: String, onResult: (Boolean) -> Unit) {
+        repository.toggleWantToListen(albumId, onResult)
+    }
 }

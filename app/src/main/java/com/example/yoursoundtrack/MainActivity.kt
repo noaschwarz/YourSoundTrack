@@ -1,10 +1,13 @@
 package com.example.yoursoundtrack
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.yoursoundtrack.managers.DataLoader
 import com.example.yoursoundtrack.managers.FirebaseAuthManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -20,23 +23,18 @@ class MainActivity : AppCompatActivity() {
         navHostFragment?.let { host ->
             val navController = host.navController
 
-            // Inflate navigation graph programmatically
             val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
-            // Determine initial destination based on auth status
+            // determine initial destination based on if we logged in on this phone or not
             if (FirebaseAuthManager.isUserLoggedIn()) {
                 navGraph.setStartDestination(R.id.navigation_home)
             } else {
                 navGraph.setStartDestination(R.id.navigation_auth)
             }
 
-            // Set the graph dynamically
             navController.graph = navGraph
-
-            // Connect BottomNavigationView to NavController
             bottomNavigationView?.setupWithNavController(navController)
-
-            // Dynamic bottom nav visibility
+            
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
                     R.id.navigation_auth -> {

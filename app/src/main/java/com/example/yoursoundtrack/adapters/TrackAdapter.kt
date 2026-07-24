@@ -7,13 +7,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yoursoundtrack.R
 
-class TrackAdapter(
-    private val tracks: List<String>
-) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tracks: List<String>) :
+    RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     class TrackViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvNumber: TextView = view.findViewById(R.id.tv_track_number)
-        val tvTitle: TextView = view.findViewById(R.id.tv_track_title)
+        val tvTrackTitle: TextView = view.findViewById(R.id.tv_track_title)
+        val tvTrackNumber: TextView? = view.findViewById(R.id.tv_track_number)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -23,8 +22,9 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.tvNumber.text = "${position + 1}."
-        holder.tvTitle.text = tracks[position]
+        val trackTitle = tracks[position]
+        holder.tvTrackTitle.text = trackTitle
+        holder.tvTrackNumber?.text = "${position + 1}."
     }
 
     override fun getItemCount(): Int = tracks.size

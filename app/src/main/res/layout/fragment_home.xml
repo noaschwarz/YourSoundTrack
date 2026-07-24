@@ -13,7 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_soundtrack"
-            android:textSize="24sp"
+            android:textSize="@dimen/screen_title_size"
             android:textStyle="bold"
             android:layout_marginBottom="24dp" />
 
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="@string/header_upcoming_releases"
             android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bold_text_size" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_upcoming_releases"
@@ -35,9 +35,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/header_popular_this_week"
+            android:text="@string/header_popular_albums"
             android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bold_text_size" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_popular_this_week"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:text="@string/header_popular_with_friends"
             android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bold_text_size" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_popular_friends"

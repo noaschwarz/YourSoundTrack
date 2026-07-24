@@ -21,8 +21,8 @@
 
     <!-- Home Screen -->
     <string name="title_soundtrack">YourSoundTrackHome</string>
-    <string name="header_upcoming_releases">Upcoming Releases</string>
-    <string name="header_popular_this_week">Popular This Week</string>
+    <string name="header_upcoming_releases">New and Upcoming</string>
+    <string name="header_popular_albums">Popular Albums</string>
     <string name="header_popular_with_friends">Popular With Friends</string>
 
     <!-- Search Screen -->

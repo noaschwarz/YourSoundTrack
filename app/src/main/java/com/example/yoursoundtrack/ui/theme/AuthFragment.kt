@@ -48,7 +48,7 @@ class AuthFragment : Fragment() {
             layoutRegister.visibility = View.VISIBLE
         }
 
-        // --- LOGIN LOGIC ---
+        // login logic
         btnSubmitLogin.setOnClickListener {
             val email = loginEmailInput.text.toString().trim()
             val password = loginPasswordInput.text.toString().trim()
@@ -70,7 +70,7 @@ class AuthFragment : Fragment() {
             }
         }
 
-        // --- REGISTRATION & FIRESTORE PROFILE LOGIC ---
+        // registration logic ---
         btnSubmitRegister.setOnClickListener {
             val name = registerNameInput.text.toString().trim()
             val email = registerEmailInput.text.toString().trim()
@@ -81,7 +81,6 @@ class AuthFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Calls createAccount passing username, email, and password
             FirebaseAuthManager.createAccount(name, email, password) { user, error ->
                 if (user != null) {
                     Toast.makeText(context, "Welcome, $name!", Toast.LENGTH_SHORT).show()
@@ -93,7 +92,6 @@ class AuthFragment : Fragment() {
                 }
             }
         }
-
         return view
     }
 }

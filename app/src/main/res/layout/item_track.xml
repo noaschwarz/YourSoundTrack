@@ -3,21 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp"
-    android:gravity="center_vertical">
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/tv_track_number"
-        android:layout_width="28dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/darker_gray" />
+        android:textColor="@android:color/darker_gray"
+        android:textSize="@dimen/text_size_small" />
 
     <TextView
         android:id="@+id/tv_track_title"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="15sp" />
+        android:layout_marginStart="12dp"
+        android:textSize="@dimen/text_size_small" />
 </LinearLayout>

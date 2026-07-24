@@ -11,7 +11,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top Navigation Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,8 +20,8 @@
 
             <ImageButton
                 android:id="@+id/btn_back"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_revert"
                 android:contentDescription="Go Back" />
@@ -31,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Album Info"
-                android:textSize="20sp"
+                android:textSize="@dimen/screen_title_size"
                 android:textStyle="bold"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
@@ -50,6 +49,7 @@
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery" />
 
+            <!-- Ratings Section -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -80,31 +80,63 @@
                     android:textColor="@android:color/darker_gray"
                     android:layout_marginTop="4dp" />
 
-                <!-- Average App Rating -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginTop="8dp">
 
-                    <RatingBar
-                        android:id="@+id/rating_bar_avg"
-                        style="?android:attr/ratingBarStyleSmall"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:isIndicator="true"
-                        android:numStars="5"
-                        android:stepSize="0.1" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tv_avg_rating_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="12sp"
-                        android:layout_marginStart="6dp"
-                        android:text="No reviews yet" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <RatingBar
+                                android:id="@+id/rating_bar_avg"
+                                style="?android:attr/ratingBarStyleSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:isIndicator="true"
+                                android:numStars="5"
+                                android:stepSize="0.1" />
+
+                            <TextView
+                                android:id="@+id/tv_avg_rating_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="12sp"
+                                android:layout_marginStart="6dp"
+                                android:text="No reviews yet" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_user_personal_rating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="@android:color/holo_blue_dark"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp"
+                            android:text="Your rating: Not rated" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btn_want_to_listen"
+                        android:layout_width="@dimen/button_size"
+                        android:layout_height="@dimen/button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@android:drawable/ic_input_add"
+                        android:contentDescription="Add to Want to Listen" />
                 </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 

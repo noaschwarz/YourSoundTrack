@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_soundtrack_new"
-            android:textSize="24sp"
+            android:textSize="@dimen/screen_title_size"
             android:textStyle="bold"
             android:layout_marginBottom="24dp" />
 
@@ -58,7 +58,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/default_item_name"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/bold_text_size"
                             android:textStyle="bold" />
 
                         <TextView
@@ -67,7 +67,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/label_date_added"
                             android:textColor="@android:color/darker_gray"
-                            android:textSize="12sp"
+                            android:textSize="@dimen/text_size_small"
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
                 </LinearLayout>

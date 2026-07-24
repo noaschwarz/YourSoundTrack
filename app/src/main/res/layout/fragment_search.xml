@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title_soundtrack_search"
-        android:textSize="24sp"
+        android:textSize="@dimen/screen_title_size"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="@string/label_browse_by"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="@dimen/bold_text_size"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_browse_release_date"
             android:padding="16dp"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_small" />
 
         <TextView
             android:id="@+id/btn_browse_genre"
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_browse_genre"
             android:padding="16dp"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_small" />
 
         <TextView
             android:id="@+id/btn_browse_most_popular"
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_browse_most_popular"
             android:padding="16dp"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_small" />
 
         <TextView
             android:id="@+id/btn_browse_highest_rated"
@@ -67,11 +67,10 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_browse_highest_rated"
             android:padding="16dp"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_small" />
 
     </LinearLayout>
 
-    <!-- Results list (hidden by default, shown when searching) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_results"
         android:layout_width="match_parent"
