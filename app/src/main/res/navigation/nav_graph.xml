@@ -8,14 +8,14 @@
     <!-- Login Screen -->
     <fragment
         android:id="@+id/navigation_auth"
-        android:name="com.example.yoursoundtrack.ui.theme.AuthFragment"
+        android:name="com.example.yoursoundtrack.fragments.AuthFragment"
         android:label="Authentication"
         tools:layout="@layout/fragment_auth" />
 
     <!-- Main Dashboard Screen -->
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.yoursoundtrack.ui.theme.HomeFragment"
+        android:name="com.example.yoursoundtrack.fragments.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home">
 
@@ -27,7 +27,7 @@
     <!-- Search Screen -->
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.example.yoursoundtrack.ui.theme.SearchFragment"
+        android:name="com.example.yoursoundtrack.fragments.SearchFragment"
         android:label="Search"
         tools:layout="@layout/fragment_search">
 
@@ -39,7 +39,7 @@
     <!-- Album Details Screen -->
     <fragment
         android:id="@+id/navigation_album_detail"
-        android:name="com.example.yoursoundtrack.ui.theme.AlbumDetailFragment"
+        android:name="com.example.yoursoundtrack.fragments.AlbumDetailFragment"
         android:label="Album Details"
         tools:layout="@layout/fragment_album_detail">
 
@@ -48,25 +48,43 @@
             app:argType="string" />
     </fragment>
 
+    <!-- Artist Details Screen -->
+    <fragment
+        android:id="@+id/navigation_artist_detail"
+        android:name="com.example.yoursoundtrack.fragments.ArtistDetailFragment"
+        android:label="Artist Details" />
+
     <!-- New Log Screen -->
     <fragment
         android:id="@+id/navigation_new"
-        android:name="com.example.yoursoundtrack.ui.theme.NewListenFragment"
+        android:name="com.example.yoursoundtrack.fragments.NewListenFragment"
         android:label="New Listen"
         tools:layout="@layout/fragment_new_listen" />
+
+    <!-- Review Screen -->
+    <fragment
+        android:id="@+id/navigation_review_detail"
+        android:name="com.example.yoursoundtrack.fragments.ReviewDetailFragment"
+        android:label="Review Details" />
 
     <!-- Community Screen -->
     <fragment
         android:id="@+id/navigation_community"
-        android:name="com.example.yoursoundtrack.ui.theme.CommunityFragment"
+        android:name="com.example.yoursoundtrack.fragments.CommunityFragment"
         android:label="Community"
         tools:layout="@layout/fragment_community" />
 
     <!-- Profile & Lists Screen -->
     <fragment
         android:id="@+id/navigation_you"
-        android:name="com.example.yoursoundtrack.ui.theme.UserFragment"
+        android:name="com.example.yoursoundtrack.fragments.UserFragment"
         android:label="You"
         tools:layout="@layout/fragment_user" />
+
+    <!-- Edit Profile Screen -->
+    <fragment
+        android:id="@+id/navigation_edit_profile"
+        android:name="com.example.yoursoundtrack.fragments.EditProfileFragment"
+        android:label="Edit Profile" />
 
 </navigation>

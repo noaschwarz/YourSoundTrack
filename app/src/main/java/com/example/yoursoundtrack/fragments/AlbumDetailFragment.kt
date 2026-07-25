@@ -1,4 +1,4 @@
-package com.example.yoursoundtrack.ui.theme
+package com.example.yoursoundtrack.fragments
 
 import android.os.Bundle
 import android.view.View
@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -19,6 +20,7 @@ import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.adapters.TrackAdapter
 import com.example.yoursoundtrack.dataModel.Album
 import com.example.yoursoundtrack.managers.loadAlbumCover
+import com.example.yoursoundtrack.managers.MusicViewModel
 import kotlinx.coroutines.launch
 
 class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
@@ -33,11 +35,19 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         val btnBack = view.findViewById<ImageButton>(R.id.btn_back)
         btnBack?.setOnClickListener { findNavController().navigateUp() }
 
+        val btnRateAlbum = view.findViewById<ImageButton>(R.id.btn_rate_album)
+
         if (!albumId.isNullOrEmpty()) {
             setupWantToListenButton(view, albumId)
             observeAlbumDetails(view, albumId)
             observeUserSavedState(view, albumId)
             observeUserRating(view, albumId)
+
+            // go to rate screen and not search
+            btnRateAlbum?.setOnClickListener {
+                val bundle = bundleOf("albumId" to albumId)
+                findNavController().navigate(R.id.navigation_new, bundle)
+            }
         }
     }
 
@@ -72,9 +82,9 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
                 viewModel.wantToListenIdsState.collect { savedIds ->
                     val isSaved = savedIds.contains(albumId)
                     if (isSaved) {
-                        btnWantToListen?.setImageResource(android.R.drawable.ic_delete)
+                        btnWantToListen?.setImageResource(R.drawable.minus_symble)
                     } else {
-                        btnWantToListen?.setImageResource(android.R.drawable.ic_input_add)
+                        btnWantToListen?.setImageResource(R.drawable.plus_symble)
                     }
                 }
             }

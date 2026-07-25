@@ -63,4 +63,19 @@
     <string name="list_filter_plan">Plan</string>
     <string name="list_filter_my_lists">My Lists</string>
     <string name="desc_user_avatar">User profile picture avatar</string>
+    <string name="fav">Fav</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="desc_artist_image">Artist image</string>
+    <string name="desc_album_cover">Album cover</string>
+
+    <!-- User Profile Edit -->
+    <string name="save_changes">Save Changes</string>
+    <string name="favorite_artists_comma_separated">Favorite Artists (comma-separated)</string>
+    <string name="top_5_albums_comma_separated_titles">Top 5 Albums (comma-separated Titles)</string>
+    <string name="profile_picture_url">Profile Picture URL</string>
+    <string name="artist_info">Artist Info</string>
+    <string name="go_back">Go Back</string>
+    <string name="album_info">Album Info</string>
+    <string name="review_info">Review info</string>
+    <string name="choose_profile_picture">Choose Profile Picture</string>
 </resources>

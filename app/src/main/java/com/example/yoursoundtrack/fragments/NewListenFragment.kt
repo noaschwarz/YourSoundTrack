@@ -1,8 +1,9 @@
-package com.example.yoursoundtrack.ui.theme
+package com.example.yoursoundtrack.fragments
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,13 +16,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.adapters.SearchAlbumAdapter
 import com.example.yoursoundtrack.dataModel.Album
+import com.example.yoursoundtrack.managers.MusicViewModel
 import com.example.yoursoundtrack.managers.loadAlbumCover
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
 
@@ -40,10 +46,34 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
         overlaySearch = view.findViewById(R.id.layout_album_search_overlay)
         layoutReviewForm = view.findViewById(R.id.layout_main_review_form)
 
-        overlaySearch.visibility = View.VISIBLE //first show search
+        val passedAlbumId = arguments?.getString("albumId")
 
         setupSearchOverlay(view)
         setupReviewForm(view)
+
+        if (!passedAlbumId.isNullOrEmpty()) {
+            //if we come from album details
+            overlaySearch.visibility = View.GONE
+            layoutReviewForm.visibility = View.VISIBLE
+            observeDirectAlbum(view, passedAlbumId)
+        } else {
+            overlaySearch.visibility = View.VISIBLE
+            layoutReviewForm.visibility = View.GONE
+        }
+    }
+
+    private fun observeDirectAlbum(view: View, albumId: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.allAlbumsState.collect { albums ->
+                    val targetAlbum = albums.find { it.id == albumId }
+                    targetAlbum?.let {
+                        selectedAlbum = it
+                        bindReviewForm(view, it)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupSearchOverlay(view: View) {
@@ -55,7 +85,7 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
             bindReviewForm(view, album)
 
             overlaySearch.visibility = View.GONE
-            layoutReviewForm.visibility = View.VISIBLE // move on to rate
+            layoutReviewForm.visibility = View.VISIBLE
         }
 
         rvSearch.apply {
@@ -94,22 +124,46 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
     private fun bindReviewForm(view: View, album: Album) {
         val tvName = view.findViewById<TextView>(R.id.text_selected_name)
         val ivCover = view.findViewById<ImageView>(R.id.iv_review_album_cover)
+        val tvDate = view.findViewById<TextView>(R.id.text_current_date_display)
 
         tvName.text = "${album.title} - ${album.artist}"
         ivCover.loadAlbumCover(album.coverUrl)
+
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        tvDate.text = dateFormat.format(Date())
     }
 
     private fun setupReviewForm(view: View) {
         val btnSave = view.findViewById<Button>(R.id.btn_save_entry)
         val ratingBar = view.findViewById<RatingBar>(R.id.rating_bar)
         val etReview = view.findViewById<EditText>(R.id.et_review_input)
+        val cbHeart = view.findViewById<CheckBox>(R.id.cb_heart_favorite)
 
         btnSave.setOnClickListener {
             val rating = ratingBar.rating
-            val reviewText = etReview.text.toString()
+            val reviewText = etReview.text.toString().trim()
+            val isFavorited = cbHeart.isChecked
 
-            if (selectedAlbum != null) {
-                Toast.makeText(requireContext(), "Saved rating for ${selectedAlbum?.title}", Toast.LENGTH_SHORT).show()
+            if (rating < 1.0f) {
+                Toast.makeText(requireContext(), "Please select a star rating (1-5)", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val album = selectedAlbum ?: run {
+                Toast.makeText(requireContext(), "No album selected", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            btnSave.isEnabled = false
+
+            viewModel.saveReview(album, rating, reviewText, isFavorited) { success ->
+                btnSave.isEnabled = true
+                if (success) {
+                    Toast.makeText(requireContext(), "Review saved!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                } else {
+                    Toast.makeText(requireContext(), "Failed to save review", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

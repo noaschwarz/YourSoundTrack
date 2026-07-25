@@ -14,6 +14,7 @@
             android:layout_height="wrap_content"
             android:text="@string/title_soundtrack"
             android:textSize="@dimen/screen_title_size"
+            android:textColor="@color/purple_200"
             android:textStyle="bold"
             android:layout_marginBottom="24dp" />
 
@@ -21,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/header_upcoming_releases"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/bold_text_size" />
 
@@ -36,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/header_popular_albums"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/bold_text_size" />
 
@@ -51,6 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/header_popular_with_friends"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/bold_text_size" />
 

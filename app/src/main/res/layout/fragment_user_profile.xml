@@ -24,13 +24,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/default_username"
+            android:textColor="@color/black"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_edit_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_profile"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_marginBottom="24dp" />
 
+        <!-- Top 5 Albums -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/top_5_albums"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -40,13 +52,14 @@
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="@dimen/text_size_small"/>
+            android:layout_marginBottom="16dp" />
 
+        <!-- Favorite Artists -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/fav_artists"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -56,13 +69,13 @@
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="@dimen/text_size_small"/>
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/last_listens"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -71,8 +84,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:layout_marginTop="8dp"
-            android:textSize="@dimen/text_size_small"/>
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </ScrollView>

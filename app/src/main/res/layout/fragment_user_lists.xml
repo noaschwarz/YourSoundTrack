@@ -21,6 +21,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/purple_500"
                 android:text="@string/list_filter_all" />
 
             <Button
@@ -28,6 +29,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/purple_500"
                 android:text="@string/list_filter_logged" />
 
             <Button
@@ -35,7 +37,16 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/purple_500"
                 android:text="@string/list_filter_plan" />
+
+            <Button
+                android:id="@+id/chip_fav"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/purple_500"
+                android:text="@string/fav" />
         </LinearLayout>
     </HorizontalScrollView>
 

@@ -26,7 +26,7 @@ class AlbumAdapter(
     }
 
     inner class AlbumViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ivCover: ImageView = itemView.findViewById(R.id.ivAlbumCover)
+        val ivCover = itemView.findViewById<ImageView>(R.id.iv_album_cover)
 
         fun bind(album: Album) {
             ivCover.loadAlbumCover(album.coverUrl)

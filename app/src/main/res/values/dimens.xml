@@ -8,4 +8,6 @@
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="bold_text_size">16sp</dimen>
     <dimen name="screen_title_size">24sp</dimen>
+    <dimen name="button_size_small">36dp</dimen>
+    <dimen name="album_cover_size">120dp</dimen>
 </resources>

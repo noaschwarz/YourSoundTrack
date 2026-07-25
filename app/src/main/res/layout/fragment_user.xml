@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/soundtrack_you"
+        android:textColor="@color/purple_200"
         android:textSize="@dimen/screen_title_size"
         android:textStyle="bold"
         android:padding="16dp" />

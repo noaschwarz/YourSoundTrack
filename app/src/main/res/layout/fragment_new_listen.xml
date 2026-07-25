@@ -17,6 +17,7 @@
             android:text="@string/title_soundtrack_new"
             android:textSize="@dimen/screen_title_size"
             android:textStyle="bold"
+            android:textColor="@color/purple_200"
             android:layout_marginBottom="24dp" />
 
         <com.google.android.material.card.MaterialCardView
@@ -27,25 +28,25 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/iv_review_album_cover"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:scaleType="centerCrop"
-                        android:src="@android:drawable/ic_menu_gallery"
+                        android:layout_width="@dimen/album_cover_size"
+                        android:layout_height="@dimen/album_cover_size"
+                        android:layout_marginEnd="12dp"
                         android:contentDescription="@string/desc_album_art_preview"
-                        android:layout_marginEnd="12dp" />
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_gallery" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -58,6 +59,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/default_item_name"
+                            android:textColor="@color/black"
                             android:textSize="@dimen/bold_text_size"
                             android:textStyle="bold" />
 
@@ -65,10 +67,10 @@
                             android:id="@+id/text_current_date_display"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="@string/label_date_added"
-                            android:textColor="@android:color/darker_gray"
-                            android:textSize="@dimen/text_size_small"
-                            android:layout_marginTop="4dp" />
+                            android:textColor="@color/gray"
+                            android:textSize="@dimen/text_size_small" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -76,21 +78,22 @@
                     android:id="@+id/rating_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
                     android:numStars="5"
-                    android:stepSize="1.0"
-                    android:layout_marginBottom="12dp" />
+                    android:stepSize="1.0" />
 
                 <EditText
                     android:id="@+id/et_review_input"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:hint="@string/hint_review"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
+                    android:layout_height="240dp"
+                    android:layout_marginBottom="16dp"
                     android:autofillHints="none"
                     android:background="@android:drawable/edit_text"
+                    android:gravity="top"
+                    android:hint="@string/hint_review"
+                    android:inputType="textMultiLine"
                     android:padding="8dp"
-                    android:layout_marginBottom="16dp" />
+                    android:textColor="@color/gray" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -99,30 +102,30 @@
 
                     <CheckBox
                         android:id="@+id/cb_heart_favorite"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/button_size_small"
+                        android:layout_height="@dimen/button_size_small"
+                        android:layout_marginEnd="16dp"
                         android:background="@drawable/selector_heart_toggle"
                         android:button="@null"
                         android:checked="false"
-                        app:buttonTint="@null"
                         app:backgroundTint="@null"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:buttonTint="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/btn_save_entry"
-                        app:layout_constraintHorizontal_chainStyle="spread_inside" />
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
                         android:id="@+id/btn_save_entry"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/btn_save"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/cb_heart_favorite" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cb_heart_favorite"
+                        app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

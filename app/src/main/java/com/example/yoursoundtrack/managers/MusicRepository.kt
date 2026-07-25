@@ -6,6 +6,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import com.example.yoursoundtrack.dataModel.Review
+import com.google.firebase.firestore.Query
 
 class MusicRepository {
 
@@ -108,6 +110,109 @@ class MusicRepository {
                         ratingsMap[albumId] = rating
                     }
                     trySend(ratingsMap)
+                }
+            }
+        awaitClose { listenerRegistration.remove() }
+    }
+
+    //reviews section
+    fun saveReview(
+        album: Album,
+        rating: Float,
+        textReview: String,
+        isFavorited: Boolean,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val userId = currentUserId ?: run {
+            onComplete(false)
+            return
+        }
+        val reviewRef = db.collection("users").document(userId).collection("listens").document()
+        val reviewId = reviewRef.id
+
+        val review = Review(
+            id = reviewId,
+            userId = userId,
+            albumId = album.id,
+            albumTitle = album.title,
+            albumArtist = album.artist,
+            albumCoverUrl = album.coverUrl,
+            rating = rating,
+            textReview = textReview,
+            isFavorited = isFavorited,
+            timestamp = System.currentTimeMillis()
+        )
+
+        db.runTransaction { transaction ->
+            transaction.set(reviewRef, review)
+            val globalReviewRef = db.collection("reviews").document(reviewId)
+            transaction.set(globalReviewRef, review)
+        }.addOnSuccessListener {
+            recalculateAlbumAverage(album.id) //update the avg
+            onComplete(true)
+        }.addOnFailureListener {
+            onComplete(false)
+        }
+    }
+
+    private fun recalculateAlbumAverage(albumId: String) {
+        db.collection("reviews")
+            .whereEqualTo("albumId", albumId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val ratings = querySnapshot.documents.mapNotNull { it.getDouble("rating")?.toFloat() }
+                    val avg = ratings.average().toFloat()
+                    db.collection("albums").document(albumId).update("avgRating", avg)
+                }
+            }
+    }
+
+    fun getUserReviewsFlow(): Flow<List<Review>> = callbackFlow {
+        val userId = currentUserId
+        if (userId == null) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+
+        val listenerRegistration = db.collection("users")
+            .document(userId)
+            .collection("listens")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val reviews = snapshot.toObjects(Review::class.java)
+                    trySend(reviews)
+                }
+            }
+        awaitClose { listenerRegistration.remove() }
+    }
+
+    fun getUserFavoriteReviewsFlow(): Flow<List<Review>> = callbackFlow {
+        val userId = currentUserId
+        if (userId == null) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+
+        val listenerRegistration = db.collection("users")
+            .document(userId)
+            .collection("listens")
+            .whereEqualTo("favorited", true)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val reviews = snapshot.toObjects(Review::class.java)
+                    trySend(reviews)
                 }
             }
         awaitClose { listenerRegistration.remove() }

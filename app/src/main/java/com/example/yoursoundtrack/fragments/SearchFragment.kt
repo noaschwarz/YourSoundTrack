@@ -1,4 +1,4 @@
-package com.example.yoursoundtrack.ui.theme
+package com.example.yoursoundtrack.fragments
 
 import android.os.Bundle
 import android.view.View
@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.adapters.SearchAlbumAdapter
 import com.example.yoursoundtrack.dataModel.Album
+import com.example.yoursoundtrack.managers.MusicViewModel
 import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment(R.layout.fragment_search) {

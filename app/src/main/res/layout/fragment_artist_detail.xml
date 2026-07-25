@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Top Header Bar: Back Button, Title, and Heart CheckBox -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/btn_back_artist_detail"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_revert"
+                android:contentDescription="Go Back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/artist_info"
+                android:textSize="@dimen/screen_title_size"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginStart="8dp" />
+
+            <CheckBox
+                android:id="@+id/btn_favorite_artist"
+                android:layout_width="@dimen/button_size_small"
+                android:layout_height="@dimen/button_size_small"
+                android:background="@drawable/selector_heart_toggle"
+                android:button="@null"
+                android:checked="false"
+                app:backgroundTint="@null"
+                app:buttonTint="@null" />
+        </LinearLayout>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_artist_detail_image"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:contentDescription="@string/desc_artist_image" />
+
+        <TextView
+            android:id="@+id/tv_artist_detail_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Artist Name"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tv_artist_detail_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Genre"
+            android:textSize="16sp"
+            android:textColor="@color/gray"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Albums"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_artist_albums"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    </LinearLayout>
+</ScrollView>

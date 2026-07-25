@@ -1,4 +1,4 @@
-package com.example.yoursoundtrack.ui.theme
+package com.example.yoursoundtrack.fragments
 
 import android.os.Bundle
 import android.view.View
