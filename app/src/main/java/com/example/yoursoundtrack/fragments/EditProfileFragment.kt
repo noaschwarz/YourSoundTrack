@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.yoursoundtrack.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
@@ -21,6 +22,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private var selectedImageUri: Uri? = null
     private lateinit var ivProfilePreview: ImageView
+    private lateinit var etUsername: TextInputEditText
     private lateinit var etTopAlbums: TextInputEditText
     private lateinit var etFavoriteArtists: TextInputEditText
 
@@ -38,6 +40,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ivProfilePreview = view.findViewById(R.id.iv_profile_preview)
+        etUsername = view.findViewById(R.id.et_username)
         etTopAlbums = view.findViewById(R.id.et_top_albums)
         etFavoriteArtists = view.findViewById(R.id.et_favorite_artists)
 
@@ -45,6 +48,11 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         view.findViewById<Button>(R.id.btn_select_photo)?.setOnClickListener {
             imagePickerLauncher.launch("image/*")
+        }
+
+        // Cancel button navigates back without writing changes
+        view.findViewById<Button>(R.id.btn_cancel)?.setOnClickListener {
+            findNavController().navigateUp()
         }
 
         view.findViewById<Button>(R.id.btn_save_profile)?.setOnClickListener {
@@ -58,22 +66,28 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             .get()
             .addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
+                    val username = snapshot.getString("username")
                     val topAlbums = snapshot.get("topAlbumIds") as? List<String> ?: emptyList()
                     val favoriteArtists = snapshot.get("favoriteArtists") as? List<String> ?: emptyList()
                     val profilePicUrl = snapshot.getString("profilePictureUrl")
 
+                    etUsername.setText(username ?: user.displayName.orEmpty())
                     etTopAlbums.setText(topAlbums.joinToString(", "))
                     etFavoriteArtists.setText(favoriteArtists.joinToString(", "))
 
                     if (!profilePicUrl.isNullOrEmpty() && selectedImageUri == null) {
                         Glide.with(this).load(profilePicUrl).into(ivProfilePreview)
                     }
+                } else {
+                    etUsername.setText(user.displayName.orEmpty())
                 }
             }
     }
 
     private fun saveProfileChanges() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
+
+        val newUsername = etUsername.text?.toString()?.trim().orEmpty()
 
         val rawAlbumsText = etTopAlbums.text?.toString().orEmpty()
         val topAlbumList = rawAlbumsText
@@ -89,9 +103,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             .filter { it.isNotEmpty() }
 
         val userUpdate = mutableMapOf<String, Any>(
+            "username" to newUsername,
             "topAlbumIds" to topAlbumList,
             "favoriteArtists" to favoriteArtistList
         )
+
+        // Also update Firebase Auth profile display name
+        if (newUsername.isNotEmpty()) {
+            val profileUpdates = userProfileChangeRequest {
+                displayName = newUsername
+            }
+            user.updateProfile(profileUpdates)
+        }
 
         val uriToUpload = selectedImageUri
         if (uriToUpload != null) {

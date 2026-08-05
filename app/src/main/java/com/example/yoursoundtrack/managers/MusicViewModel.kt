@@ -81,6 +81,30 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyMap()
         )
 
+    //real-time friends updates
+    val friendsAllActivityState: StateFlow<List<Review>> = repository.getFriendsActivityFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val friendsListensState: StateFlow<List<Review>> = friendsAllActivityState
+        .map { reviews -> reviews.filter { it.textReview.isBlank() } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val friendsReviewsState: StateFlow<List<Review>> = friendsAllActivityState
+        .map { reviews -> reviews.filter { it.textReview.isNotBlank() } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     fun toggleWantToListen(albumId: String, onResult: (Boolean) -> Unit) {
         repository.toggleWantToListen(albumId, onResult)
     }

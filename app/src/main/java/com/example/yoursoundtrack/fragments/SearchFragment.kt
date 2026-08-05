@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.adapters.SearchAlbumAdapter
+import com.example.yoursoundtrack.adapters.UserAdapter
 import com.example.yoursoundtrack.dataModel.Album
+import com.example.yoursoundtrack.managers.FirebaseAuthManager
 import com.example.yoursoundtrack.managers.MusicViewModel
 import kotlinx.coroutines.launch
 
@@ -23,6 +25,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private val viewModel: MusicViewModel by activityViewModels()
     private lateinit var searchAdapter: SearchAlbumAdapter
+    private lateinit var userAdapter: UserAdapter
     private var allAlbums: List<Album> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -31,6 +34,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val searchBar = view.findViewById<SearchView>(R.id.search_bar)
         val layoutCategories = view.findViewById<LinearLayout>(R.id.layout_browse_categories)
         val rvResults = view.findViewById<RecyclerView>(R.id.rv_search_results)
+        val rvUserResults = view.findViewById<RecyclerView>(R.id.rv_user_search_results)
 
         searchAdapter = SearchAlbumAdapter { selectedAlbum ->
             val bundle = bundleOf("albumId" to selectedAlbum.id)
@@ -38,6 +42,11 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 R.id.action_navigation_search_to_navigation_album_detail,
                 bundle
             )
+        }
+
+        userAdapter = UserAdapter { selectedUser ->
+            val bundle = bundleOf("userId" to selectedUser.uid)
+            findNavController().navigate(R.id.navigation_you, bundle)
         }
 
         rvResults.apply {
@@ -50,7 +59,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.allAlbumsState.collect { albums ->
                     allAlbums = albums
-                    filterList(searchBar.query.toString())
+                    filterList(searchBar.query.toString(), layoutCategories, rvResults, rvUserResults)
                 }
             }
         }
@@ -60,25 +69,37 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 val query = newText.orEmpty().trim()
-                if (query.isEmpty()) {
-                    layoutCategories.visibility = View.VISIBLE
-                    rvResults.visibility = View.GONE
-                } else {
-                    layoutCategories.visibility = View.GONE
-                    rvResults.visibility = View.VISIBLE
-                    filterList(query)
-                }
+                filterList(query, layoutCategories, rvResults, rvUserResults)
                 return true
             }
         })
     }
 
-    private fun filterList(query: String) {
-        if (query.isEmpty()) return
-        val filtered = allAlbums.filter { album ->
+    private fun filterList(
+        query: String,
+        categoriesLayout: LinearLayout,
+        rvAlbums: RecyclerView,
+        rvUsers: RecyclerView?
+    ) {
+        if (query.isEmpty()) {
+            categoriesLayout.visibility = View.VISIBLE
+            rvAlbums.visibility = View.GONE
+            rvUsers?.visibility = View.GONE
+            return
+        }
+
+        categoriesLayout.visibility = View.GONE
+        rvAlbums.visibility = View.VISIBLE
+        rvUsers?.visibility = View.VISIBLE
+
+        val filteredAlbums = allAlbums.filter { album ->
             album.title.contains(query, ignoreCase = true) ||
                     album.artist.contains(query, ignoreCase = true)
         }
-        searchAdapter.submitList(filtered)
+        searchAdapter.submitList(filteredAlbums)
+
+        FirebaseAuthManager.searchUsers(query) { users ->
+            userAdapter.submitList(users)
+        }
     }
 }

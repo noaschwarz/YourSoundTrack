@@ -1,13 +1,14 @@
 package com.example.yoursoundtrack.managers
 
 import com.example.yoursoundtrack.dataModel.Album
+import com.example.yoursoundtrack.dataModel.Review
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import com.example.yoursoundtrack.dataModel.Review
-import com.google.firebase.firestore.Query
 
 class MusicRepository {
 
@@ -216,5 +217,55 @@ class MusicRepository {
                 }
             }
         awaitClose { listenerRegistration.remove() }
+    }
+
+    // REAL-TIME Friends Activity Flow
+    fun getFriendsActivityFlow(): Flow<List<Review>> = callbackFlow {
+        val userId = currentUserId
+        if (userId == null) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+
+        var reviewsListener: ListenerRegistration? = null
+
+        val userListener = db.collection("users").document(userId)
+            .addSnapshotListener { userDoc, userError ->
+                if (userError != null) {
+                    close(userError)
+                    return@addSnapshotListener
+                }
+
+                val friendIds = (userDoc?.get("friendIds") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+
+                if (friendIds.isEmpty()) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                // Remove prior reviews listener if friend list updates
+                reviewsListener?.remove()
+
+                // Listen to friends' reviews in real time (up to 30 friends)
+                reviewsListener = db.collection("reviews")
+                    .whereIn("userId", friendIds.take(30))
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(20)
+                    .addSnapshotListener { snapshot, reviewsError ->
+                        if (reviewsError != null) {
+                            return@addSnapshotListener
+                        }
+                        if (snapshot != null) {
+                            val reviews = snapshot.toObjects(Review::class.java)
+                            trySend(reviews)
+                        }
+                    }
+            }
+
+        awaitClose {
+            userListener.remove()
+            reviewsListener?.remove()
+        }
     }
 }

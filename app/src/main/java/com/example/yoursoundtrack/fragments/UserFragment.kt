@@ -14,10 +14,11 @@ class UserFragment : Fragment(R.layout.fragment_user) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val userId = arguments?.getString("userId")
         val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout_user)
         val viewPager = view.findViewById<ViewPager2>(R.id.view_pager_user)
 
-        viewPager.adapter = UserPageAdapter(this)
+        viewPager.adapter = UserPageAdapter(this, userId)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {

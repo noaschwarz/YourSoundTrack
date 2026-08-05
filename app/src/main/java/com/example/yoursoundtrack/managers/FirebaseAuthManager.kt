@@ -3,6 +3,8 @@ package com.example.yoursoundtrack.managers
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.yoursoundtrack.dataModel.UserProfile
+import com.google.firebase.firestore.FieldValue
 
 object FirebaseAuthManager {
     val auth: FirebaseAuth by lazy {
@@ -65,6 +67,51 @@ object FirebaseAuthManager {
                     onResult(null, errorMessage)
                 }
             }
+    }
+
+    fun followUser(targetUid: String, onComplete: (Boolean) -> Unit) {
+        val currentUid = auth.currentUser?.uid ?: return
+        db.collection("users").document(currentUid)
+            .update("friendIds", FieldValue.arrayUnion(targetUid))
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    fun unfollowUser(targetUid: String, onComplete: (Boolean) -> Unit) {
+        val currentUid = auth.currentUser?.uid ?: return
+        db.collection("users").document(currentUid)
+            .update("friendIds", FieldValue.arrayRemove(targetUid))
+            .addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+    fun searchUsers(query: String, onResult: (List<UserProfile>) -> Unit) {
+        val currentUid = auth.currentUser?.uid ?: ""
+        db.collection("users")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val users = snapshot.documents.mapNotNull { it.toObject(UserProfile::class.java) }
+                val filtered = users.filter { user ->
+                    user.uid != currentUid &&
+                            (user.username.contains(query, ignoreCase = true) || user.email.contains(query, ignoreCase = true))
+                }
+                onResult(filtered)
+            }
+    }
+
+    fun fetchFriends(onResult: (List<UserProfile>) -> Unit) {
+        val currentUid = auth.currentUser?.uid ?: return
+        db.collection("users").document(currentUid).get().addOnSuccessListener { doc ->
+            val user = doc.toObject(UserProfile::class.java)
+            val friendIds = user?.friendIds ?: emptyList()
+            if (friendIds.isEmpty()) {
+                onResult(emptyList())
+                return@addOnSuccessListener
+            }
+            db.collection("users").whereIn("uid", friendIds).get().addOnSuccessListener { snapshot ->
+                onResult(snapshot.documents.mapNotNull { it.toObject(UserProfile::class.java) })
+            }
+        }
     }
 
     fun logout() {

@@ -72,7 +72,16 @@
         android:id="@+id/navigation_community"
         android:name="com.example.yoursoundtrack.fragments.CommunityFragment"
         android:label="Community"
-        tools:layout="@layout/fragment_community" />
+        tools:layout="@layout/fragment_community">
+
+        <action
+            android:id="@+id/action_navigation_community_to_navigation_review_detail"
+            app:destination="@id/navigation_review_detail" />
+
+        <action
+            android:id="@+id/action_navigation_community_to_navigation_album_detail"
+            app:destination="@id/navigation_album_detail" />
+    </fragment>
 
     <!-- Profile & Lists Screen -->
     <fragment
