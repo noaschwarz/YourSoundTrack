@@ -254,4 +254,17 @@ class MusicViewModel : ViewModel() {
                 _topFiveAlbums.value = matchedAlbums
             }
     }
+
+    fun getAlbumsForArtist(
+        artistId: String,
+        artistName: String,
+        albumIds: List<String> = emptyList()
+    ): StateFlow<List<Album>> {
+        return repository.getAlbumsByArtistFlow(artistId, artistName, albumIds)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
+    }
 }

@@ -9,9 +9,10 @@ import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.dataModel.UserProfile
 
 class UserAdapter(
-    private var users: List<UserProfile> = emptyList(),
     private val onUserClick: (UserProfile) -> Unit
 ) : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
+
+    private var users: List<UserProfile> = emptyList()
 
     fun submitList(newList: List<UserProfile>) {
         users = newList

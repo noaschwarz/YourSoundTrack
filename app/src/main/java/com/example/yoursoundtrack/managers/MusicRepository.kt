@@ -9,6 +9,7 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.util.Locale
 
 class MusicRepository {
 
@@ -247,17 +248,17 @@ class MusicRepository {
                 // Remove prior reviews listener if friend list updates
                 reviewsListener?.remove()
 
-                // Listen to friends' reviews in real time (up to 30 friends)
+                // Query by friendIds without orderBy to avoid missing index failures, then sort in memory
                 reviewsListener = db.collection("reviews")
                     .whereIn("userId", friendIds.take(30))
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
-                    .limit(20)
                     .addSnapshotListener { snapshot, reviewsError ->
                         if (reviewsError != null) {
                             return@addSnapshotListener
                         }
                         if (snapshot != null) {
                             val reviews = snapshot.toObjects(Review::class.java)
+                                .sortedByDescending { it.timestamp }
+                                .take(20)
                             trySend(reviews)
                         }
                     }
@@ -267,5 +268,44 @@ class MusicRepository {
             userListener.remove()
             reviewsListener?.remove()
         }
+    }
+
+    fun getAlbumsByArtistFlow(
+        artistId: String,
+        artistName: String,
+        albumIds: List<String> = emptyList()
+    ): Flow<List<Album>> = callbackFlow {
+        val listenerRegistration = db.collection("albums")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val allAlbums = snapshot.toObjects(Album::class.java)
+
+                    fun normalize(input: String): String {
+                        return input.lowercase(Locale.ROOT).replace("[^a-z0-9]".toRegex(), "")
+                    }
+
+                    val targetIdClean = normalize(artistId)
+                    val targetNameClean = normalize(artistName)
+
+                    val filteredAlbums = allAlbums.filter { album ->
+                        val albumArtistClean = normalize(album.artist)
+
+                        // 1. Direct key/name equality
+                        albumArtistClean == targetIdClean ||
+                                albumArtistClean == targetNameClean ||
+                                // 2. Substring matching (handles "Artist feat. Extra")
+                                (targetNameClean.isNotEmpty() && albumArtistClean.contains(targetNameClean)) ||
+                                (targetIdClean.isNotEmpty() && albumArtistClean.contains(targetIdClean)) ||
+                                // 3. ID match from artist's albumIds list
+                                albumIds.contains(album.id)
+                    }
+                    trySend(filteredAlbums.distinctBy { it.id })
+                }
+            }
+        awaitClose { listenerRegistration.remove() }
     }
 }

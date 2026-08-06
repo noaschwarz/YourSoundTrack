@@ -24,22 +24,26 @@ class ReviewDetailFragment : Fragment(R.layout.fragment_review_detail) {
 
         val reviewId = arguments?.getString("reviewId") ?: return
 
-        viewModel.userReviews.value?.find { it.id == reviewId }?.let { review ->
-            view.findViewById<TextView>(R.id.tv_detail_title).text = review.albumTitle
-            view.findViewById<TextView>(R.id.tv_detail_artist).text = review.albumArtist
-            view.findViewById<TextView>(R.id.tv_detail_review_text).text = review.textReview
-            view.findViewById<RatingBar>(R.id.rating_detail).rating = review.rating
+        val review = viewModel.friendsAllActivityState.value.find { it.id == reviewId }
+            ?: viewModel.userReviews.value?.find { it.id == reviewId }
+            ?: viewModel.lastListensState.value.find { it.id == reviewId }
+
+        review?.let { item ->
+            view.findViewById<TextView>(R.id.tv_detail_title).text = item.albumTitle
+            view.findViewById<TextView>(R.id.tv_detail_artist).text = item.albumArtist
+            view.findViewById<TextView>(R.id.tv_detail_review_text).text = item.textReview.ifEmpty { "No text review provided." }
+            view.findViewById<RatingBar>(R.id.rating_detail).rating = item.rating
             view.findViewById<View>(R.id.btn_back_review_detail)?.setOnClickListener {
                 findNavController().navigateUp()
             }
 
             val sdf = SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault())
-            val formattedDate = sdf.format(Date(review.timestamp))
+            val formattedDate = sdf.format(Date(item.timestamp))
             view.findViewById<TextView>(R.id.tv_detail_timestamp).text = "Logged on: $formattedDate"
 
             val ivCover = view.findViewById<ImageView>(R.id.iv_detail_cover)
             Glide.with(this)
-                .load(review.albumCoverUrl)
+                .load(item.albumCoverUrl)
                 .placeholder(R.drawable.singer_icon)
                 .into(ivCover)
         }

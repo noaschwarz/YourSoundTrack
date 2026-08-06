@@ -77,20 +77,45 @@
 
     </LinearLayout>
 
-    <!-- Album Search Results -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_search_results"
+    <!-- Scrollable container for search results -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:visibility="gone" />
+        android:fillViewport="true">
 
-    <!-- User Search Results -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_user_search_results"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="8dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Artist Search Results (Positioned at top for visibility) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_artist_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Album Search Results -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <!-- User Search Results -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_user_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
