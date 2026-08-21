@@ -1,6 +1,7 @@
 package com.example.yoursoundtrack.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -103,7 +104,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
         }
 
         view.findViewById<RecyclerView>(R.id.rv_artist_albums)?.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 2)
             adapter = albumAdapter
         }
     }
@@ -112,7 +113,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getAlbumsForArtist(artist.id, artist.name, artist.albumIds).collectLatest { albums ->
                 if (albums.isNotEmpty()) {
-                    albumAdapter.submitList(albums)
+                    albumAdapter.submitList(albums.take(20))
                 }
             }
         }

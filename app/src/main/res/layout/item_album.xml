@@ -10,7 +10,7 @@
         android:id="@+id/iv_album_cover"
         android:layout_width="@dimen/album_cover_size"
         android:layout_height="@dimen/album_cover_size"
-        android:scaleType="centerInside"
+        android:scaleType="fitCenter"
         android:contentDescription="@string/desc_artist_image" />
 
 </LinearLayout>
