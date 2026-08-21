@@ -24,11 +24,12 @@ class ReviewDetailFragment : Fragment(R.layout.fragment_review_detail) {
 
         val reviewId = arguments?.getString("reviewId") ?: return
 
+        //serch for review ID across app
         val review = viewModel.friendsAllActivityState.value.find { it.id == reviewId }
             ?: viewModel.userReviews.value?.find { it.id == reviewId }
             ?: viewModel.lastListensState.value.find { it.id == reviewId }
 
-        review?.let { item ->
+        review?.let { item -> //bind review
             view.findViewById<TextView>(R.id.tv_detail_title).text = item.albumTitle
             view.findViewById<TextView>(R.id.tv_detail_artist).text = item.albumArtist
             view.findViewById<TextView>(R.id.tv_detail_review_text).text = item.textReview.ifEmpty { "No text review provided." }
@@ -37,10 +38,12 @@ class ReviewDetailFragment : Fragment(R.layout.fragment_review_detail) {
                 findNavController().navigateUp()
             }
 
+            //formt display based on log time
             val sdf = SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault())
             val formattedDate = sdf.format(Date(item.timestamp))
             view.findViewById<TextView>(R.id.tv_detail_timestamp).text = "Logged on: $formattedDate"
 
+            //laod cover
             val ivCover = view.findViewById<ImageView>(R.id.iv_detail_cover)
             Glide.with(this)
                 .load(item.albumCoverUrl)

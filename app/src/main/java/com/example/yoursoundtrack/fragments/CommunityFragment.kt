@@ -37,6 +37,7 @@ class CommunityFragment : Fragment() {
         return view
     }
 
+    //horizontal for friend feed
     private fun setupRecyclerViews(view: View) {
         val onItemClick: (Review) -> Unit = { review ->
             val bundle = Bundle().apply {
@@ -60,6 +61,7 @@ class CommunityFragment : Fragment() {
         }
     }
 
+    //place holder
     private fun setupStaticButtons(view: View) {
         view.findViewById<View>(R.id.btn_popular_new_reviews)?.setOnClickListener {
             Toast.makeText(context, "Popular Reviews feature coming soon!", Toast.LENGTH_SHORT).show()
@@ -69,6 +71,7 @@ class CommunityFragment : Fragment() {
         }
     }
 
+    //flow for listens and review of friends
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

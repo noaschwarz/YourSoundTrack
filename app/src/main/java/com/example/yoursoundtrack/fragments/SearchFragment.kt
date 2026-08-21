@@ -44,6 +44,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val rvUserResults = view.findViewById<RecyclerView>(R.id.rv_user_search_results)
         val rvArtistResults = view.findViewById<RecyclerView>(R.id.rv_artist_search_results)
 
+        //set up nav for album items
         searchAdapter = SearchAlbumAdapter { selectedAlbum ->
             val bundle = bundleOf("albumId" to selectedAlbum.id)
             findNavController().navigate(
@@ -52,11 +53,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             )
         }
 
+        //set up nav for user profile items
         userAdapter = UserAdapter { selectedUser ->
             val bundle = bundleOf("userId" to selectedUser.uid)
             findNavController().navigate(R.id.navigation_you, bundle)
         }
 
+        //set up nav for artist items
         artistAdapter = ArtistAdapter { selectedArtist ->
             val bundle = bundleOf("artistId" to selectedArtist.id)
             findNavController().navigate(R.id.navigation_artist_detail, bundle)
@@ -77,7 +80,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             adapter = userAdapter
         }
 
-        // live flow of albums
+        // live flow of albums from viewModel
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -107,6 +110,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         })
     }
 
+    //filter out based on the curr serch
     private fun filterList(
         query: String,
         categoriesLayout: LinearLayout?,

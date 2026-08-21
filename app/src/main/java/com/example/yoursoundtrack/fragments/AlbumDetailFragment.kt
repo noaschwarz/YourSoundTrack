@@ -51,6 +51,7 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         }
     }
 
+    //toggle the album in or out of WTL
     private fun setupWantToListenButton(view: View, albumId: String) {
         val btnWantToListen = view.findViewById<ImageButton>(R.id.btn_want_to_listen)
         btnWantToListen?.setOnClickListener {
@@ -63,6 +64,7 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         }
     }
 
+    //get the curr album details
     private fun observeAlbumDetails(view: View, albumId: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -74,6 +76,7 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         }
     }
 
+    // update the bookmark icon base on state
     private fun observeUserSavedState(view: View, albumId: String) {
         val btnWantToListen = view.findViewById<ImageButton>(R.id.btn_want_to_listen)
 
@@ -91,6 +94,7 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         }
     }
 
+    //display curr users rating
     private fun observeUserRating(view: View, albumId: String) {
         val tvUserRating = view.findViewById<TextView>(R.id.tv_user_personal_rating)
 
@@ -108,6 +112,7 @@ class AlbumDetailFragment : Fragment(R.layout.fragment_album_detail) {
         }
     }
 
+    //bind the album info to UI
     private fun bindAlbumData(view: View, album: Album) {
         view.findViewById<TextView>(R.id.tv_detail_title)?.text = album.title
         view.findViewById<TextView>(R.id.tv_detail_artist)?.text = album.artist

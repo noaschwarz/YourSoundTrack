@@ -11,13 +11,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
-import java.util.Locale
 
 private data class AlbumResponse(
     val albums: List<Album> = emptyList()
 )
 
-// Add this wrapper for artists.json structure
 private data class ArtistResponse(
     val artists: List<Artist> = emptyList()
 )
@@ -26,14 +24,12 @@ object DataLoader {
 
     private const val TAG = "DataLoader"
 
-    /**
-     * Reads a JSON file from the assets folder and updates the records in the Firestore "albums" collection.
-     */
+     //read albums json and update records in firebase
     suspend fun syncAlbumsFromAssetsToFirestore(
         context: Context,
         fileName: String = "albums.json",
         onComplete: ((successCount: Int, failureCount: Int) -> Unit)? = null
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(Dispatchers.IO) { //use dispatchers to not use the main thread
         val db = FirebaseFirestore.getInstance()
         val albumsCollection = db.collection("albums")
 

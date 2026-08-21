@@ -11,12 +11,12 @@ import com.bumptech.glide.Glide
 import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.dataModel.Review
 
-class FriendActivityAdapter(
+class FriendActivityAdapter( //history for FRIENDS of current profile logged
     private var reviews: List<Review> = emptyList(),
     private val onItemClick: (Review) -> Unit
 ) : RecyclerView.Adapter<FriendActivityAdapter.ViewHolder>() {
 
-    fun submitList(newList: List<Review>) {
+    fun submitList(newList: List<Review>) { //custom submit
         reviews = newList
         notifyDataSetChanged()
     }
@@ -44,7 +44,7 @@ class FriendActivityAdapter(
             tvTitle.text = review.albumTitle
             tvArtist.text = review.albumArtist
             ratingBar.rating = review.rating
-
+            //show revirw if exists
             if (review.textReview.isNotBlank()) {
                 tvReviewText.visibility = View.VISIBLE
                 tvReviewText.text = review.textReview

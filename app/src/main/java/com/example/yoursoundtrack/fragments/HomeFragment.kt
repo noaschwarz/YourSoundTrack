@@ -30,6 +30,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         observeViewModel()
     }
 
+    //configure layouts
     private fun setupRecyclerViews(view: View) {
         val onAlbumClick: (Album) -> Unit = { album ->
             val bundle = Bundle().apply {

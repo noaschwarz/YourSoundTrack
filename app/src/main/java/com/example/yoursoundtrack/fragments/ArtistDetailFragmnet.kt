@@ -37,6 +37,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
 
         setupAlbumRecyclerView(view)
 
+        //laod curr users fav artists
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             viewModel.loadFavoriteArtists(userId)
@@ -44,13 +45,14 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
 
         val rawArtistId = arguments?.getString("artistId") ?: return
 
+        //chack if info is cached
         val cachedArtist = viewModel.favoriteArtists.value?.find {
             it.id.equals(rawArtistId, ignoreCase = true) || it.name.equals(rawArtistId, ignoreCase = true)
         }
 
         if (cachedArtist != null && cachedArtist.imageUrl.isNotBlank()) {
             bindArtistData(view, cachedArtist)
-        } else {
+        } else { //bring the data from firefox if not cached
             val targetDocId = rawArtistId.lowercase(Locale.ROOT).replace(" ", "_")
 
             FirebaseFirestore.getInstance().collection("artists").document(targetDocId)
@@ -69,6 +71,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
         }
     }
 
+    //fallback if lookup fails
     private fun searchArtistInCollectionFallback(view: View, searchKey: String) {
         fun clean(str: String) = str.lowercase(Locale.ROOT).replace("[^a-z0-9]".toRegex(), "")
         val cleanSearchKey = clean(searchKey)
@@ -97,6 +100,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
             }
     }
 
+    //set up grid to display
     private fun setupAlbumRecyclerView(view: View) {
         albumAdapter = AlbumAdapter { album ->
             val bundle = Bundle().apply { putString("albumId", album.id) }
@@ -109,6 +113,7 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
         }
     }
 
+    //bind artist data
     private fun bindArtistData(view: View, artist: Artist) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getAlbumsForArtist(artist.id, artist.name, artist.albumIds).collectLatest { albums ->

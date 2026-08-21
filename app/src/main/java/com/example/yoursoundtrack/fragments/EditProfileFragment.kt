@@ -1,5 +1,6 @@
 package com.example.yoursoundtrack.fragments
 
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -17,6 +18,7 @@ import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
+import kotlin.io.encoding.Base64
 
 class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
@@ -25,17 +27,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var etUsername: TextInputEditText
     private lateinit var etTopAlbums: TextInputEditText
     private lateinit var etFavoriteArtists: TextInputEditText
-
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            selectedImageUri = it
-            Glide.with(this)
-                .load(it)
-                .into(ivProfilePreview)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,19 +38,17 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         loadExistingProfile()
 
         view.findViewById<Button>(R.id.btn_select_photo)?.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
+            Toast.makeText(context, "Pending development", Toast.LENGTH_SHORT).show()
         }
-
-        // Cancel button navigates back without writing changes
-        view.findViewById<Button>(R.id.btn_cancel)?.setOnClickListener {
+        view.findViewById<Button>(R.id.btn_cancel)?.setOnClickListener { //go back
             findNavController().navigateUp()
         }
-
-        view.findViewById<Button>(R.id.btn_save_profile)?.setOnClickListener {
+        view.findViewById<Button>(R.id.btn_save_profile)?.setOnClickListener { //save
             saveProfileChanges()
         }
     }
 
+    //load curr user info
     private fun loadExistingProfile() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         FirebaseFirestore.getInstance().collection("users").document(user.uid)
@@ -75,7 +64,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     etTopAlbums.setText(topAlbums.joinToString(", "))
                     etFavoriteArtists.setText(favoriteArtists.joinToString(", "))
 
-                    if (!profilePicUrl.isNullOrEmpty() && selectedImageUri == null) {
+                    if (!profilePicUrl.isNullOrEmpty()) {
                         Glide.with(this).load(profilePicUrl).into(ivProfilePreview)
                     }
                 } else {
@@ -84,58 +73,39 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             }
     }
 
+    //validate the inputs
     private fun saveProfileChanges() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
 
         val newUsername = etUsername.text?.toString()?.trim().orEmpty()
-
         val rawAlbumsText = etTopAlbums.text?.toString().orEmpty()
         val topAlbumList = rawAlbumsText
             .split(",")
             .map { it.trim() }
             .filter { it.isNotEmpty() }
             .take(5) // Limit to top 5
-
+        //clean out top 5 albums
         val rawArtistsText = etFavoriteArtists.text?.toString().orEmpty()
         val favoriteArtistList = rawArtistsText
             .split(",")
             .map { it.trim() }
             .filter { it.isNotEmpty() }
-
+        //clean out fav artists
         val userUpdate = mutableMapOf<String, Any>(
             "username" to newUsername,
             "topAlbumIds" to topAlbumList,
             "favoriteArtists" to favoriteArtistList
         )
-
-        // Also update Firebase Auth profile display name
+        //update diaply name
         if (newUsername.isNotEmpty()) {
             val profileUpdates = userProfileChangeRequest {
                 displayName = newUsername
             }
             user.updateProfile(profileUpdates)
         }
-
-        val uriToUpload = selectedImageUri
-        if (uriToUpload != null) {
-            val storageRef = FirebaseStorage.getInstance().reference
-                .child("profile_pictures/${user.uid}.jpg")
-
-            storageRef.putFile(uriToUpload)
-                .addOnSuccessListener {
-                    storageRef.downloadUrl.addOnSuccessListener { downloadUri: Uri ->
-                        userUpdate["profilePictureUrl"] = downloadUri.toString()
-                        updateFirestoreAndExit(user.uid, userUpdate)
-                    }
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            updateFirestoreAndExit(user.uid, userUpdate)
-        }
+        updateFirestoreAndExit(user.uid, userUpdate)
     }
-
+    //update the data to firebase
     private fun updateFirestoreAndExit(uid: String, data: Map<String, Any>) {
         FirebaseFirestore.getInstance().collection("users")
             .document(uid)

@@ -8,7 +8,7 @@ fun ImageView.loadAlbumCover(
     placeholderRes: Int = android.R.drawable.ic_menu_gallery,
     errorRes: Int = android.R.drawable.ic_menu_report_image
 ) {
-    if (url.isNullOrBlank()) {
+    if (url.isNullOrBlank()) { //see if we have a url
         setImageResource(placeholderRes)
         return
     }

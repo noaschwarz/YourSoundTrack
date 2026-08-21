@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class MusicViewModel : ViewModel() {
+class MusicViewModel : ViewModel() { //brige from rep to ui
 
     private val repository = MusicRepository()
 
@@ -84,6 +84,7 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    //filter friends listens
     val friendsListensState: StateFlow<List<Review>> = friendsAllActivityState
         .map { reviews -> reviews.filter { it.textReview.isBlank() } }
         .stateIn(
@@ -92,6 +93,7 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    //filter friends reviews
     val friendsReviewsState: StateFlow<List<Review>> = friendsAllActivityState
         .map { reviews -> reviews.filter { it.textReview.isNotBlank() } }
         .stateIn(
@@ -100,6 +102,7 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    //last listens
     val lastListensState: StateFlow<List<Review>> = repository.getUserReviewsFlow()
         .stateIn(
             scope = viewModelScope,
@@ -107,6 +110,7 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    //fav reviewa
     val favoriteReviewsState: StateFlow<List<Review>> = repository.getFavoriteReviewsFlow()
         .stateIn(
             scope = viewModelScope,
@@ -114,8 +118,9 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
-    private val selectedUserId = MutableStateFlow("")
+    private val selectedUserId = MutableStateFlow("") //hold the user id
 
+    //fetch reviews selected profile
     val userReviewsState: StateFlow<List<Review>> = selectedUserId
         .flatMapLatest { userId ->
             if (userId.isBlank()) MutableStateFlow(emptyList())
@@ -126,7 +131,7 @@ class MusicViewModel : ViewModel() {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
+    //fetch fav artists selected profile
     val favoriteArtistsState: StateFlow<List<Artist>> = selectedUserId
         .flatMapLatest { userId ->
             if (userId.isBlank()) MutableStateFlow(emptyList())
@@ -137,7 +142,7 @@ class MusicViewModel : ViewModel() {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
+    // display top 5 albums
     val topFiveAlbumsState: StateFlow<List<Album>> = combine(
         allAlbumsState,
         selectedUserId.flatMapLatest { userId ->
@@ -175,6 +180,7 @@ class MusicViewModel : ViewModel() {
         repository.toggleWantToListen(albumId, onResult)
     }
 
+    //forward the review
     fun saveReview(
         album: Album,
         rating: Float,
@@ -198,6 +204,7 @@ class MusicViewModel : ViewModel() {
 
     val allArtists: LiveData<List<Artist>> = allArtistsState.asLiveData()
 
+    //return the albums of an artist
     fun getAlbumsForArtist(
         artistId: String,
         artistName: String,

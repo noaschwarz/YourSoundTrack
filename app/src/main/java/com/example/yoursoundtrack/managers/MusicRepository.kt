@@ -23,7 +23,7 @@ class MusicRepository {
     private val currentUserId: String?
         get() = auth.currentUser?.uid
 
-     // see what albums we have in db
+     // see what albums we have in db and update if needed
     fun getAlbumsFlow(): Flow<List<Album>> = callbackFlow {
         val listenerRegistration = db.collection("albums")
             .addSnapshotListener { snapshot, error ->
@@ -176,6 +176,7 @@ class MusicRepository {
         }
     }
 
+    // live update of user reviews
     fun getUserReviewsFlow(): Flow<List<Review>> = callbackFlow {
         val userId = currentUserId
         if (userId == null) {
@@ -201,6 +202,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    // see what reviews a user has
     fun getUserReviewsFlowByUserId(userId: String): Flow<List<Review>> = callbackFlow {
         val listenerRegistration = db.collection("users")
             .document(userId)
@@ -219,6 +221,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    //live update of reviews where the album was favuried
     fun getFavoriteReviewsFlow(): Flow<List<Review>> = callbackFlow {
         val userId = currentUserId
         if (userId == null) {
@@ -244,6 +247,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    //live updates of the fav artists of a user
     fun getFavoriteArtistsFlow(userId: String): Flow<List<Artist>> = callbackFlow {
         val listenerRegistration = db.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
@@ -262,7 +266,7 @@ class MusicRepository {
                 db.collection("artists")
                     .whereIn(FieldPath.documentId(), queryIds)
                     .get()
-                    .addOnSuccessListener { querySnapshot ->
+                    .addOnSuccessListener { querySnapshot -> //if we found artists we build them properly
                         val foundArtists = querySnapshot.documents.mapNotNull { doc ->
                             doc.toObject(Artist::class.java)
                         }
@@ -280,6 +284,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    //get a user's top 5 albums (by id)
     fun getTopAlbumIdsFlow(userId: String): Flow<List<String>> = callbackFlow {
         val listenerRegistration = db.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
@@ -293,6 +298,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    //favor an artist
     fun toggleFavoriteArtist(artistNameOrId: String, onResult: (Boolean) -> Unit) {
         val userId = currentUserId ?: return
         val userRef = db.collection("users").document(userId)
@@ -318,6 +324,7 @@ class MusicRepository {
         }
     }
 
+    //live updates of friends (users you follow) activities
     fun getFriendsActivityFlow(): Flow<List<Review>> = callbackFlow {
         val userId = currentUserId
         if (userId == null) {
@@ -345,7 +352,7 @@ class MusicRepository {
                 // Remove prior reviews listener if friend list updates
                 reviewsListener?.remove()
 
-                // Query by friendIds without orderBy to avoid missing index failures, then sort in memory
+                // Query by friendIds without orderBy to avoid missing index failures
                 reviewsListener = db.collection("reviews")
                     .whereIn("userId", friendIds.take(30))
                     .addSnapshotListener { snapshot, reviewsError ->
@@ -367,6 +374,7 @@ class MusicRepository {
         }
     }
 
+    // see what artists we have in db and update if needed
     fun getArtistsFlow(): Flow<List<Artist>> = callbackFlow {
         val listenerRegistration = db.collection("artists")
             .addSnapshotListener { snapshot, error ->
@@ -382,6 +390,7 @@ class MusicRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
+    //get all the albums an artists has
     fun getAlbumsByArtistFlow(
         artistId: String,
         artistName: String,
@@ -389,26 +398,26 @@ class MusicRepository {
     ): Flow<List<Album>> = callbackFlow {
         val targetDocId = artistId.lowercase(Locale.ROOT).replace(" ", "_")
         var albumsRegistration: ListenerRegistration? = null
-        val artistRegistration = db.collection("artists").document(targetDocId)
+        val artistRegistration = db.collection("artists").document(targetDocId) //see what artists we are looking at
             .addSnapshotListener { artistSnapshot, artistError ->
                 if (artistError != null || artistSnapshot == null || !artistSnapshot.exists()) {
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
-                val fetchedArtist = artistSnapshot.toObject(Artist::class.java)
+                val fetchedArtist = artistSnapshot.toObject(Artist::class.java) //clean up the artist
                 val authoritativeAlbumIds = (fetchedArtist?.albumIds.orEmpty() + albumIds)
                     .map { it.trim() }
                     .filter { it.isNotEmpty() }
                     .distinct()
                 val authoritativeArtistId = fetchedArtist?.id?.takeIf { it.isNotBlank() } ?: artistId
-                albumsRegistration?.remove()
+                albumsRegistration?.remove() //no duplicate listeners
                 albumsRegistration = db.collection("albums")
                     .addSnapshotListener { albumSnapshot, albumError ->
                         if (albumError != null || albumSnapshot == null) {
-                            return@addSnapshotListener // Don't wipe out existing list on minor error
+                            return@addSnapshotListener
                         }
                         val allAlbums = albumSnapshot.toObjects(Album::class.java)
-                        val matchedAlbums = allAlbums.filter { album ->
+                        val matchedAlbums = allAlbums.filter { album -> //filter by album ID or artist name/ID
                             val albumId = album.id.trim()
                             val albumArtistId = album.artistId.trim()
 
@@ -418,7 +427,6 @@ class MusicRepository {
                                     albumArtistId.equals(artistName, ignoreCase = true)
                             matchesIdArray || matchesArtistField
                         }
-                        // Only send if we found albums, or if authoritativeAlbumIds is truly empty
                         if (matchedAlbums.isNotEmpty() || authoritativeAlbumIds.isEmpty()) {
                             trySend(matchedAlbums.distinctBy { it.id })
                         }

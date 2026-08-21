@@ -41,7 +41,7 @@ class UserProfileFragment : Fragment(R.layout.fragment_user_profile) {
         val followBtn = view.findViewById<Button>(R.id.btn_follow)
         val tvUsername = view.findViewById<TextView>(R.id.text_username_label)
 
-        if (isSelf) {
+        if (isSelf) { //toggle edit based on profile ownership
             editBtn?.visibility = View.VISIBLE
             followBtn?.visibility = View.GONE
         } else {
@@ -74,6 +74,7 @@ class UserProfileFragment : Fragment(R.layout.fragment_user_profile) {
         }
     }
 
+    //configure follow and handlers for extrnal users
     private fun setupFollowButton(targetUid: String, followBtn: Button?) {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         db.collection("users").document(currentUid).get().addOnSuccessListener { doc ->
@@ -102,6 +103,7 @@ class UserProfileFragment : Fragment(R.layout.fragment_user_profile) {
         }
     }
 
+    //set up all needed adapters
     private fun setupRecyclerViews(view: View) {
         topFiveAdapter = AlbumAdapter { album ->
             val bundle = Bundle().apply { putString("albumId", album.id) }

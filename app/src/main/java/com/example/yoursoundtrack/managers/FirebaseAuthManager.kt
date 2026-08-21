@@ -7,7 +7,7 @@ import com.example.yoursoundtrack.dataModel.UserProfile
 import com.google.firebase.firestore.FieldValue
 
 object FirebaseAuthManager {
-    val auth: FirebaseAuth by lazy {
+    val auth: FirebaseAuth by lazy { //lazy to opt startup since we have a lot of data
         FirebaseAuth.getInstance()
     }
 
@@ -69,6 +69,7 @@ object FirebaseAuthManager {
             }
     }
 
+    //follow and unfollow users (follow = friend)
     fun followUser(targetUid: String, onComplete: (Boolean) -> Unit) {
         val currentUid = auth.currentUser?.uid ?: return
         db.collection("users").document(currentUid)
@@ -85,6 +86,7 @@ object FirebaseAuthManager {
             .addOnFailureListener { onComplete(false) }
     }
 
+    //search logged in users by name / email
     fun searchUsers(query: String, onResult: (List<UserProfile>) -> Unit) {
         val currentUid = auth.currentUser?.uid ?: ""
         db.collection("users")

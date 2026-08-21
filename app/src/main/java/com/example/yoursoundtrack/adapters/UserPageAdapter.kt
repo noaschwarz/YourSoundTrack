@@ -11,7 +11,7 @@ class UserPageAdapter(fragment: Fragment, private val userId: String? = null) : 
 
     override fun createFragment(position: Int): Fragment {
         val bundle = Bundle().apply { putString("userId", userId) }
-        return when (position) {
+        return when (position) { //presents the corrct profile base on who the user is and what profile they look at
             0 -> UserProfileFragment().apply { arguments = bundle }
             1 -> UserListsFragment().apply { arguments = bundle }
             else -> UserProfileFragment().apply { arguments = bundle }

@@ -38,12 +38,12 @@ class AuthFragment : Fragment() {
         val registerEmailInput = view.findViewById<EditText>(R.id.et_register_email)
         val registerPasswordInput = view.findViewById<EditText>(R.id.et_register_password)
 
-        btnWelcomeLogin.setOnClickListener {
+        btnWelcomeLogin.setOnClickListener { //login view
             layoutWelcome.visibility = View.GONE
             cardLoginPopup.visibility = View.VISIBLE
         }
 
-        btnWelcomeNewUser.setOnClickListener {
+        btnWelcomeNewUser.setOnClickListener { //welcome view
             layoutWelcome.visibility = View.GONE
             layoutRegister.visibility = View.VISIBLE
         }
@@ -61,6 +61,7 @@ class AuthFragment : Fragment() {
             FirebaseAuthManager.loginUser(email, password) { user, error ->
                 if (user != null) {
                     Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
+                    //nav to home screen if frag is active
                     if (isAdded && findNavController().currentDestination?.id == R.id.navigation_auth) {
                         findNavController().navigate(R.id.navigation_home)
                     }
@@ -70,7 +71,7 @@ class AuthFragment : Fragment() {
             }
         }
 
-        // registration logic ---
+        // registration logic
         btnSubmitRegister.setOnClickListener {
             val name = registerNameInput.text.toString().trim()
             val email = registerEmailInput.text.toString().trim()

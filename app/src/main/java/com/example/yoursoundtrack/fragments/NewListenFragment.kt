@@ -62,6 +62,7 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
         }
     }
 
+    //fetch and bind album detiles if we are from album detils page
     private fun observeDirectAlbum(view: View, albumId: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -76,6 +77,7 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
         }
     }
 
+    //set up search and selection
     private fun setupSearchOverlay(view: View) {
         val searchView = view.findViewById<SearchView>(R.id.search_view_album)
         val rvSearch = view.findViewById<RecyclerView>(R.id.rv_search_results)
@@ -121,6 +123,7 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
         })
     }
 
+    //populat ui for review w album info
     private fun bindReviewForm(view: View, album: Album) {
         val tvName = view.findViewById<TextView>(R.id.text_selected_name)
         val ivCover = view.findViewById<ImageView>(R.id.iv_review_album_cover)
@@ -133,6 +136,7 @@ class NewListenFragment : Fragment(R.layout.fragment_new_listen) {
         tvDate.text = dateFormat.format(Date())
     }
 
+    //trigger submission
     private fun setupReviewForm(view: View) {
         val btnSave = view.findViewById<Button>(R.id.btn_save_entry)
         val ratingBar = view.findViewById<RatingBar>(R.id.rating_bar)

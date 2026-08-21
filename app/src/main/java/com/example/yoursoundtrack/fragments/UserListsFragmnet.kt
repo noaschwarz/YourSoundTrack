@@ -49,6 +49,7 @@ class UserListsFragment : Fragment(R.layout.fragment_user_lists) {
         view.findViewById<Button>(R.id.chip_fav)?.setOnClickListener { observeLists("fav") }
     }
 
+    //combine flow of lists
     private fun observeLists(filterMode: String) {
         observeJob?.cancel()
 

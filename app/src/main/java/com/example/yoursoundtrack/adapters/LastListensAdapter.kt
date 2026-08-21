@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.yoursoundtrack.R
 import com.example.yoursoundtrack.dataModel.Review
 
-class LastListensAdapter(
+class LastListensAdapter( //history for current profile logged
     private var reviews: List<Review> = emptyList(),
     private val onItemClick: (Review) -> Unit
 ) : RecyclerView.Adapter<LastListensAdapter.ReviewViewHolder>() {
