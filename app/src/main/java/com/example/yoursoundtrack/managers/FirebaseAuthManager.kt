@@ -99,6 +99,7 @@ object FirebaseAuthManager {
             }
     }
 
+     // get friends
     fun fetchFriends(onResult: (List<UserProfile>) -> Unit) {
         val currentUid = auth.currentUser?.uid ?: return
         db.collection("users").document(currentUid).get().addOnSuccessListener { doc ->
@@ -108,8 +109,29 @@ object FirebaseAuthManager {
                 onResult(emptyList())
                 return@addOnSuccessListener
             }
-            db.collection("users").whereIn("uid", friendIds).get().addOnSuccessListener { snapshot ->
-                onResult(snapshot.documents.mapNotNull { it.toObject(UserProfile::class.java) })
+
+            val chunks = friendIds.chunked(30)
+            val combinedProfiles = mutableListOf<UserProfile>()
+            var completedRequests = 0
+
+            for (chunk in chunks) {
+                db.collection("users").whereIn("uid", chunk).get()
+                    .addOnSuccessListener { snapshot ->
+                        val profiles = snapshot.documents.mapNotNull { it.toObject(UserProfile::class.java) }
+                        synchronized(combinedProfiles) {
+                            combinedProfiles.addAll(profiles)
+                        }
+                        completedRequests++
+                        if (completedRequests == chunks.size) {
+                            onResult(combinedProfiles)
+                        }
+                    }
+                    .addOnFailureListener {
+                        completedRequests++
+                        if (completedRequests == chunks.size) {
+                            onResult(combinedProfiles)
+                        }
+                    }
             }
         }
     }

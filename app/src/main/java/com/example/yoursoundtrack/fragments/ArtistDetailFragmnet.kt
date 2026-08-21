@@ -109,8 +109,16 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
     }
 
     private fun bindArtistData(view: View, artist: Artist) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getAlbumsForArtist(artist.id, artist.name, artist.albumIds).collectLatest { albums ->
+                if (albums.isNotEmpty()) {
+                    albumAdapter.submitList(albums)
+                }
+            }
+        }
+
         view.findViewById<TextView>(R.id.tv_artist_detail_name)?.text = artist.name.ifBlank { artist.id }
-        view.findViewById<TextView>(R.id.tv_artist_detail_genre)?.text = artist.genre
+        view.findViewById<TextView>(R.id.tv_artist_detail_genre)?.text = artist.genres.joinToString(", ")
 
         val ivImage = view.findViewById<ImageView>(R.id.iv_artist_detail_image)
         if (ivImage != null) {
@@ -141,12 +149,6 @@ class ArtistDetailFragment : Fragment(R.layout.fragment_artist_detail) {
                 if (!success) {
                     cbFavorite.isChecked = !cbFavorite.isChecked
                 }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getAlbumsForArtist(artist.id, artist.name, artist.albumIds).collectLatest { albums ->
-                albumAdapter.submitList(albums)
             }
         }
     }

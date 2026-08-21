@@ -4,25 +4,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="2dp">
+    android:padding="8dp">
 
     <ImageView
         android:id="@+id/iv_album_cover"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scaleType="centerCrop"
-        android:adjustViewBounds="true"
+        android:layout_width="@dimen/album_cover_size"
+        android:layout_height="@dimen/album_cover_size"
+        android:scaleType="center"
         android:contentDescription="@string/desc_artist_image" />
 
-    <TextView
-        android:id="@+id/tv_album_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:layout_marginTop="2dp" />
 </LinearLayout>

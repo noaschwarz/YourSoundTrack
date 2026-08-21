@@ -7,11 +7,19 @@ import com.example.yoursoundtrack.dataModel.Artist
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.InputStreamReader
 import java.util.Locale
 
 private data class AlbumResponse(
     val albums: List<Album> = emptyList()
+)
+
+// Add this wrapper for artists.json structure
+private data class ArtistResponse(
+    val artists: List<Artist> = emptyList()
 )
 
 object DataLoader {
@@ -21,156 +29,124 @@ object DataLoader {
     /**
      * Reads a JSON file from the assets folder and updates the records in the Firestore "albums" collection.
      */
-    fun syncAlbumsFromAssetsToFirestore(
+    suspend fun syncAlbumsFromAssetsToFirestore(
         context: Context,
         fileName: String = "albums.json",
         onComplete: ((successCount: Int, failureCount: Int) -> Unit)? = null
-    ) {
+    ) = withContext(Dispatchers.IO) {
         val db = FirebaseFirestore.getInstance()
         val albumsCollection = db.collection("albums")
 
         try {
-            val inputStream = context.assets.open(fileName)
-            val reader = InputStreamReader(inputStream)
-            val albumResponse = Gson().fromJson(reader, AlbumResponse::class.java)
-            reader.close()
+            val albumResponse = context.assets.open(fileName).use { inputStream ->
+                InputStreamReader(inputStream).use { reader ->
+                    Gson().fromJson(reader, AlbumResponse::class.java)
+                }
+            }
 
             val albums = albumResponse.albums
             if (albums.isEmpty()) {
                 Log.w(TAG, "No albums found in $fileName")
-                onComplete?.invoke(0, 0)
-                return
+                withContext(Dispatchers.Main) { onComplete?.invoke(0, 0) }
+                return@withContext
             }
 
             Log.d(TAG, "Starting sync for ${albums.size} albums from assets...")
 
-            var batch = db.batch()
-            var operationCount = 0
             var totalSuccess = 0
             var totalFailure = 0
 
-            albums.forEachIndexed { index, album ->
-                val docRef = albumsCollection.document(album.id)
-
-                batch.set(docRef, album, SetOptions.merge())
-                operationCount++
-
-                if (operationCount == 400 || index == albums.size - 1) {
-                    val currentBatch = batch
-                    val countInThisBatch = operationCount
-
-                    currentBatch.commit()
-                        .addOnSuccessListener {
-                            totalSuccess += countInThisBatch
-                            Log.d(TAG, "Batch committed. Processed: ${totalSuccess + totalFailure}/${albums.size}")
-                            if (totalSuccess + totalFailure == albums.size) {
-                                onComplete?.invoke(totalSuccess, totalFailure)
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            totalFailure += countInThisBatch
-                            Log.e(TAG, "Failed to commit batch: ${e.message}", e)
-                            if (totalSuccess + totalFailure == albums.size) {
-                                onComplete?.invoke(totalSuccess, totalFailure)
-                            }
-                        }
-
-                    batch = db.batch()
-                    operationCount = 0
+            val chunks = albums.chunked(400)
+            for (chunk in chunks) {
+                val batch = db.batch()
+                chunk.forEach { album ->
+                    val docRef = if (album.id.isNotBlank()) {
+                        albumsCollection.document(album.id)
+                    } else {
+                        albumsCollection.document()
+                    }
+                    batch.set(docRef, album, SetOptions.merge())
                 }
+
+                try {
+                    batch.commit().await()
+                    totalSuccess += chunk.size
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to commit batch: ${e.message}", e)
+                    totalFailure += chunk.size
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                onComplete?.invoke(totalSuccess, totalFailure)
             }
 
         } catch (e: Exception) {
             Log.e(TAG, "Error reading or parsing $fileName from assets: ${e.message}", e)
-            onComplete?.invoke(0, 0)
+            withContext(Dispatchers.Main) {
+                onComplete?.invoke(0, 0)
+            }
         }
     }
 
-     //updates the artist collection
-    fun syncArtistsFromAlbumsToFirestore(
+    //updates the artist collection
+    suspend fun syncArtistsFromAssetsToFirestore(
         context: Context,
-        fileName: String = "albums.json",
+        fileName: String = "artists.json",
         onComplete: ((successCount: Int, failureCount: Int) -> Unit)? = null
-    ) {
+    ) = withContext(Dispatchers.IO) {
         val db = FirebaseFirestore.getInstance()
         val artistsCollection = db.collection("artists")
 
         try {
-            val inputStream = context.assets.open(fileName)
-            val reader = InputStreamReader(inputStream)
-            val albumResponse = Gson().fromJson(reader, AlbumResponse::class.java)
-            reader.close()
-
-            val albums = albumResponse.albums
-            if (albums.isEmpty()) {
-                Log.w(TAG, "No albums found in $fileName")
-                onComplete?.invoke(0, 0)
-                return
-            }
-
-            val artistMap = mutableMapOf<String, Artist>()
-
-            albums.forEach { album ->
-                val artistName = album.artist?.trim()
-                if (!artistName.isNullOrEmpty()) {
-                    val artistId = artistName.lowercase(Locale.ROOT)
-                        .replace("[^a-z0-9_]".toRegex(), "_")
-
-                    val existingArtist = artistMap[artistId]
-                    val updatedAlbumIds = (existingArtist?.albumIds ?: emptyList()) + album.id
-
-                    artistMap[artistId] = Artist(
-                        id = artistId,
-                        name = artistName,
-                        genre = album.genre ?: "",
-                        imageUrl = album.coverUrl ?: "",
-                        albumIds = updatedAlbumIds.distinct()
-                    )
+            val artistResponse = context.assets.open(fileName).use { inputStream ->
+                InputStreamReader(inputStream).use { reader ->
+                    Gson().fromJson(reader, ArtistResponse::class.java)
                 }
             }
 
-            val artistsList = artistMap.values.toList()
-            Log.d(TAG, "Extracted ${artistsList.size} unique artists from $fileName")
+            val artists = artistResponse.artists
+            if (artists.isEmpty()) {
+                Log.w(TAG, "No artists found in $fileName")
+                withContext(Dispatchers.Main) { onComplete?.invoke(0, 0) }
+                return@withContext
+            }
 
-            var batch = db.batch()
-            var operationCount = 0
+            Log.d(TAG, "Starting sync for ${artists.size} artists from $fileName...")
+
             var totalSuccess = 0
             var totalFailure = 0
 
-            artistsList.forEachIndexed { index, artist ->
-                val docRef = artistsCollection.document(artist.id)
+            val chunks = artists.chunked(400)
+            for (chunk in chunks) {
+                val batch = db.batch()
+                chunk.forEach { artist ->
+                    val docRef = if (artist.id.isNotBlank()) {
+                        artistsCollection.document(artist.id)
+                    } else {
+                        artistsCollection.document()
+                    }
+                    batch.set(docRef, artist, SetOptions.merge())
+                }
 
-                batch.set(docRef, artist, SetOptions.merge())
-                operationCount++
-
-                if (operationCount == 400 || index == artistsList.size - 1) {
-                    val currentBatch = batch
-                    val countInThisBatch = operationCount
-
-                    currentBatch.commit()
-                        .addOnSuccessListener {
-                            totalSuccess += countInThisBatch
-                            Log.d(TAG, "Artists batch committed. Processed: ${totalSuccess + totalFailure}/${artistsList.size}")
-                            if (totalSuccess + totalFailure == artistsList.size) {
-                                onComplete?.invoke(totalSuccess, totalFailure)
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            totalFailure += countInThisBatch
-                            Log.e(TAG, "Failed to commit artists batch: ${e.message}", e)
-                            if (totalSuccess + totalFailure == artistsList.size) {
-                                onComplete?.invoke(totalSuccess, totalFailure)
-                            }
-                        }
-
-                    batch = db.batch()
-                    operationCount = 0
+                try {
+                    batch.commit().await()
+                    totalSuccess += chunk.size
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to commit artists batch: ${e.message}", e)
+                    totalFailure += chunk.size
                 }
             }
 
+            withContext(Dispatchers.Main) {
+                onComplete?.invoke(totalSuccess, totalFailure)
+            }
+
         } catch (e: Exception) {
-            Log.e(TAG, "Error syncing artists from $fileName: ${e.message}", e)
-            onComplete?.invoke(0, 0)
+            Log.e(TAG, "Error reading or parsing $fileName from assets: ${e.message}", e)
+            withContext(Dispatchers.Main) {
+                onComplete?.invoke(0, 0)
+            }
         }
     }
 }

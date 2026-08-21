@@ -1,22 +1,17 @@
 package com.example.yoursoundtrack.managers
 
-import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.yoursoundtrack.dataModel.Album
 import com.example.yoursoundtrack.dataModel.Artist
 import com.example.yoursoundtrack.dataModel.Review
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -105,11 +100,81 @@ class MusicViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    val lastListensState: StateFlow<List<Review>> = repository.getUserReviewsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val favoriteReviewsState: StateFlow<List<Review>> = repository.getFavoriteReviewsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    private val selectedUserId = MutableStateFlow("")
+
+    val userReviewsState: StateFlow<List<Review>> = selectedUserId
+        .flatMapLatest { userId ->
+            if (userId.isBlank()) MutableStateFlow(emptyList())
+            else repository.getUserReviewsFlowByUserId(userId)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val favoriteArtistsState: StateFlow<List<Artist>> = selectedUserId
+        .flatMapLatest { userId ->
+            if (userId.isBlank()) MutableStateFlow(emptyList())
+            else repository.getFavoriteArtistsFlow(userId)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val topFiveAlbumsState: StateFlow<List<Album>> = combine(
+        allAlbumsState,
+        selectedUserId.flatMapLatest { userId ->
+            if (userId.isBlank()) MutableStateFlow(emptyList())
+            else repository.getTopAlbumIdsFlow(userId)
+        }
+    ) { albums, savedQueries ->
+        savedQueries.mapNotNull { query ->
+            albums.find { album -> album.id == query || album.title.equals(query, ignoreCase = true) }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    // --- Backwards Compatibility LiveData Bridges for Fragments ---
+    val userReviews: LiveData<List<Review>> = userReviewsState.asLiveData()
+    val favoriteArtists: LiveData<List<Artist>> = favoriteArtistsState.asLiveData()
+    val topFiveAlbums: LiveData<List<Album>> = topFiveAlbumsState.asLiveData()
+
+    fun loadUserReviews(userId: String) {
+        selectedUserId.value = userId
+    }
+
+    fun loadFavoriteArtists(userId: String) {
+        selectedUserId.value = userId
+    }
+
+    fun loadTopFiveAlbums(userId: String) {
+        selectedUserId.value = userId
+    }
+
     fun toggleWantToListen(albumId: String, onResult: (Boolean) -> Unit) {
         repository.toggleWantToListen(albumId, onResult)
     }
 
-    //save section
     fun saveReview(
         album: Album,
         rating: Float,
@@ -120,140 +185,18 @@ class MusicViewModel : ViewModel() {
         repository.saveReview(album, rating, textReview, isFavorited, onComplete)
     }
 
-    val lastListensState: StateFlow<List<Review>> = repository.getUserReviewsFlow()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-    val favoriteReviewsState: StateFlow<List<Review>> = repository.getUserFavoriteReviewsFlow()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-    private val _userReviews = MutableLiveData<List<Review>>()
-    val userReviews: LiveData<List<Review>> = _userReviews
-
-    fun loadUserReviews(userId: String) {
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .collection("listens")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Log.e("MusicViewModel", "Error fetching listens", error)
-                    return@addSnapshotListener
-                }
-
-                val reviewsList = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(Review::class.java)
-                } ?: emptyList()
-
-                _userReviews.value = reviewsList
-            }
-    }
-
-    private val _favoriteArtists = MutableLiveData<List<Artist>>()
-    val favoriteArtists: LiveData<List<Artist>> = _favoriteArtists
-
-    fun loadFavoriteArtists(userId: String) {
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("users").document(userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
-
-                val artistNamesOrIds = snapshot.get("favoriteArtists") as? List<String> ?: emptyList()
-                if (artistNamesOrIds.isEmpty()) {
-                    _favoriteArtists.value = emptyList()
-                    return@addSnapshotListener
-                }
-
-                db.collection("artists")
-                    .whereIn(FieldPath.documentId(), artistNamesOrIds.take(10))
-                    .get()
-                    .addOnSuccessListener { querySnapshot ->
-                        val foundArtists = querySnapshot.documents.mapNotNull { doc ->
-                            doc.toObject(Artist::class.java)
-                        }
-
-                        if (foundArtists.isEmpty()) {
-                            _favoriteArtists.value = artistNamesOrIds.map { name ->
-                                Artist(id = name, name = name)
-                            }
-                        } else {
-                            _favoriteArtists.value = foundArtists
-                        }
-                    }
-                    .addOnFailureListener {
-                        _favoriteArtists.value = artistNamesOrIds.map { name ->
-                            Artist(id = name, name = name)
-                        }
-                    }
-            }
-    }
-
     fun toggleFavoriteArtist(artistNameOrId: String, onResult: (Boolean) -> Unit = {}) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
-
-        userRef.get().addOnSuccessListener { snapshot ->
-            val currentFavs = snapshot.get("favoriteArtists") as? List<String> ?: emptyList()
-            val isFav = currentFavs.contains(artistNameOrId)
-
-            val update = if (isFav) {
-                FieldValue.arrayRemove(artistNameOrId)
-            } else {
-                FieldValue.arrayUnion(artistNameOrId)
-            }
-
-            userRef.update("favoriteArtists", update)
-                .addOnSuccessListener {
-                    loadFavoriteArtists(userId)
-                    onResult(!isFav)
-                }
-                .addOnFailureListener {
-                    val data = mapOf("favoriteArtists" to listOf(artistNameOrId))
-                    userRef.set(data, SetOptions.merge())
-                        .addOnSuccessListener {
-                            loadFavoriteArtists(userId)
-                            onResult(true)
-                        }
-                        .addOnFailureListener { onResult(false) }
-                }
-        }
+        repository.toggleFavoriteArtist(artistNameOrId, onResult)
     }
 
-    private val _topFiveAlbums = MutableLiveData<List<Album>>()
-    val topFiveAlbums: LiveData<List<Album>> = _topFiveAlbums
+    val allArtistsState: StateFlow<List<Artist>> = repository.getArtistsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun loadTopFiveAlbums(userId: String) {
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("users").document(userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
-
-                val savedIdsOrTitles = snapshot.get("topAlbumIds") as? List<String> ?: emptyList()
-                if (savedIdsOrTitles.isEmpty()) {
-                    _topFiveAlbums.value = emptyList()
-                    return@addSnapshotListener
-                }
-
-                val allAlbums = allAlbumsState.value
-                val matchedAlbums = savedIdsOrTitles.mapNotNull { query ->
-                    allAlbums.find { album ->
-                        album.id == query || album.title.equals(query, ignoreCase = true)
-                    }
-                }
-
-                _topFiveAlbums.value = matchedAlbums
-            }
-    }
+    val allArtists: LiveData<List<Artist>> = allArtistsState.asLiveData()
 
     fun getAlbumsForArtist(
         artistId: String,

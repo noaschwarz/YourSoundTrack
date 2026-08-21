@@ -10,5 +10,5 @@ data class Review(
     val rating: Float = 0f,
     val textReview: String = "",
     val isFavorited: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = 0L
 )

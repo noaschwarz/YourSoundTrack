@@ -22,7 +22,6 @@ import com.example.yoursoundtrack.dataModel.Album
 import com.example.yoursoundtrack.dataModel.Artist
 import com.example.yoursoundtrack.managers.FirebaseAuthManager
 import com.example.yoursoundtrack.managers.MusicViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -68,26 +67,33 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             adapter = searchAdapter
         }
 
-        // live flow of our albums
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allAlbumsState.collect { albums ->
-                    allAlbums = albums
-                    if (allArtists.isEmpty() && albums.isNotEmpty()) {
-                        allArtists = extractArtistsFromAlbums(albums)
-                    }
-                    filterList(searchBar.query.toString(), layoutCategories, rvResults, rvUserResults, rvArtistResults)
-                }
-            }
+        rvArtistResults?.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = artistAdapter
         }
 
-        loadArtists { artists ->
-            if (artists.isNotEmpty()) {
-                allArtists = artists
-            } else if (allAlbums.isNotEmpty()) {
-                allArtists = extractArtistsFromAlbums(allAlbums)
+        rvUserResults?.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = userAdapter
+        }
+
+        // live flow of albums
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.allAlbumsState.collect { albums ->
+                        allAlbums = albums
+                        filterList(searchBar.query.toString(), layoutCategories, rvResults, rvUserResults, rvArtistResults)
+                    }
+                }
+                // Live flow of Firestore artists
+                launch {
+                    viewModel.allArtistsState.collect { artists ->
+                        allArtists = artists
+                        filterList(searchBar.query.toString(), layoutCategories, rvResults, rvUserResults, rvArtistResults)
+                    }
+                }
             }
-            filterList(searchBar.query.toString(), layoutCategories, rvResults, rvUserResults, rvArtistResults)
         }
 
         searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -99,31 +105,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 return true
             }
         })
-    }
-
-    private fun extractArtistsFromAlbums(albums: List<Album>): List<Artist> {
-        return albums
-            .mapNotNull { album ->
-                val name = album.artist?.trim()
-                if (name.isNullOrEmpty()) null else name to album.coverUrl
-            }
-            .distinctBy { it.first.lowercase(Locale.ROOT) }
-            .map { (name, coverUrl) ->
-                val id = name.lowercase(Locale.ROOT).replace("[^a-z0-9_]".toRegex(), "_")
-                Artist(id = id, name = name, imageUrl = coverUrl)
-            }
-    }
-
-    private fun loadArtists(onComplete: (List<Artist>) -> Unit) {
-        FirebaseFirestore.getInstance().collection("artists")
-            .get()
-            .addOnSuccessListener { query ->
-                val artists = query.documents.mapNotNull { it.toObject(Artist::class.java) }
-                onComplete(artists)
-            }
-            .addOnFailureListener {
-                onComplete(emptyList())
-            }
     }
 
     private fun filterList(
@@ -143,7 +124,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         categoriesLayout?.visibility = View.GONE
 
-        // 1. Filter Albums
+        //filter albums
         val filteredAlbums = allAlbums.filter { album ->
             album.title.contains(query, ignoreCase = true) ||
                     album.artist.contains(query, ignoreCase = true)
@@ -151,15 +132,16 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         searchAdapter.submitList(filteredAlbums)
         rvAlbums?.visibility = if (filteredAlbums.isNotEmpty()) View.VISIBLE else View.GONE
 
-        // 2. Filter Artists
+        //filter artists
         val filteredArtists = allArtists.filter { artist ->
             artist.name.contains(query, ignoreCase = true) ||
-                    artist.id.replace("_", " ").contains(query, ignoreCase = true)
+                    artist.id.replace("_", " ").contains(query, ignoreCase = true) ||
+                    artist.genres.any { it.contains(query, ignoreCase = true) }
         }
         artistAdapter.submitList(filteredArtists)
         rvArtists?.visibility = if (filteredArtists.isNotEmpty()) View.VISIBLE else View.GONE
 
-        // 3. Filter Users with Debug Logging & Strict Visibility Setup
+        //filter users
         FirebaseAuthManager.searchUsers(query) { users ->
             activity?.runOnUiThread {
                 Log.d("SearchUsers", "Query: '$query' | Found users count: ${users.size}")
