@@ -152,16 +152,15 @@ class MusicRepository {
         )
 
         db.runTransaction { transaction ->
-            transaction.set(reviewRef, review)
-            val globalReviewRef = db.collection("reviews").document(reviewId)
-            transaction.set(globalReviewRef, review)
-
             val albumDoc = transaction.get(albumRef)
             val currentRating = albumDoc.getDouble("avgRating") ?: 0.0
             val currentCount = albumDoc.getLong("ratingCount") ?: 0L
-
             val newCount = currentCount + 1
             val newAvg = ((currentRating * currentCount) + rating) / newCount
+
+            transaction.set(reviewRef, review)
+            val globalReviewRef = db.collection("reviews").document(reviewId)
+            transaction.set(globalReviewRef, review)
 
             transaction.update(
                 albumRef, mapOf(
@@ -171,7 +170,7 @@ class MusicRepository {
             )
         }.addOnSuccessListener {
             onComplete(true)
-        }.addOnFailureListener {
+        }.addOnFailureListener { e ->
             onComplete(false)
         }
     }

@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        runDataLoaderSync()
+//        runDataLoaderSync() //sync data if needed
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         val navHostFragment = supportFragmentManager
