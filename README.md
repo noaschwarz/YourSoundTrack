@@ -26,6 +26,7 @@ A casual music tracking app for rating, sharing with friends, and list making
 
 ## Project Structure
 
+```text
 com.example.yoursoundtrack
 │
 ├── adapters/        # RecyclerView adapters for search results and lists
