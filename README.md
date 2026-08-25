@@ -24,6 +24,19 @@ A casual music tracking app for rating, sharing with friends, and list making
 
 ---
 
+## Screenshots
+
+In order of appearance: home screen, search screen, add new review/listen screen, community screen, profile page main and lists screens.
+
+<img width="220" height="420" alt="Screenshot_20260825-153024" src="https://github.com/user-attachments/assets/42ca7fe3-dd28-42ea-be88-81c5478203c1" />
+<img width="220" height="420" alt="Screenshot_20260825-153101" src="https://github.com/user-attachments/assets/90e17a9b-fb9d-47c0-b040-168b3d88afe0" />
+<img width="220" height="420" alt="Screenshot_20260825-153111" src="https://github.com/user-attachments/assets/f1918592-6fef-4ac7-aa63-684ded7b637a" />
+<img width="220" height="420" alt="Screenshot_20260825-153115" src="https://github.com/user-attachments/assets/da67291b-9456-4288-ad45-1f9217252b5f" />
+<img width="220" height="420" alt="Screenshot_20260825-153211" src="https://github.com/user-attachments/assets/6fae9f3a-0ae1-4fe0-929d-e76236dc1b88" />
+<img width="220" height="420" alt="Screenshot_20260825-154206" src="https://github.com/user-attachments/assets/8c8164ff-2166-4f22-9577-0394d36adf8e" />
+
+---
+
 ## Project Structure
 
 ```text
